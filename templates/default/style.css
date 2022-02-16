@@ -1,0 +1,168 @@
+body{
+	font-size: 1.1em;
+	background: #f7f7f7;
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+	line-height: 1.5;
+	margin: 0;
+}
+
+a{
+	text-decoration: none;
+	color: #0000ee;
+}
+
+a:hover{
+	text-decoration: underline;
+}
+
+label, .label{
+	margin-top: 10px;
+}
+
+.input{
+	font-size: 1em;
+	width: 100%;
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	padding: 5px;
+}
+
+.btn{
+	font-size: 0.7em;
+	border-radius: 4px;
+	background: #ccc;
+	padding: 5px 10px;
+}
+
+.btn.btn-primary{
+	background: #0000ee;
+	color: #fff;
+}
+
+
+#flash{
+	background: #eee;
+	padding: 10px 15px;
+	border-radius: 3px;
+	font-size: 0.9em;
+}
+
+
+/* Panel */
+.panel{
+	max-width: 50%;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin: 0 auto;
+	background: #fff;
+	box-shadow: 1px 1px #ccc;
+}
+.panel .heading{
+	margin: 0;
+	background: #eee;
+	padding: 10px 10px 10px 5%;
+	font-size: 1em;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+.panel .body{
+	display: block;
+	margin: 5% auto;
+	width: 90%;	
+}
+/* END Panel */
+
+
+/* Helpers */
+.d-block{ display: block; }
+.text-center{ text-align: center; }
+.small{ font-size: 0.8em; }
+/* END Helpers */
+
+
+
+/* Login page */
+#login {
+	margin-top: 2%;
+}
+#login input, #login .input{
+	font-size: 1em;
+	width: 100%;
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	padding: 5px;
+}
+/* END Login page */
+
+
+/* Navbar */
+#navbar{
+	background: #ccc;
+	padding: 10px 20px 8px 20px;
+}
+#navbar:after{
+	clear: both;
+	content: " ";
+	display: block;
+}
+#navbar form{
+	display: inline;
+}
+#navbar-left{
+	float: left;
+	width: 70%;
+}
+#navbar-left h1{
+	font-size: 1.1em;
+	margin: 0 20px 0 0;
+	display: inline-block;
+}
+#navbar-right{
+	float: right;
+	text-align: right;
+	width: 30%;
+	font-size: 1em;
+}
+/* END Navbar */
+
+
+/* Main */
+#main{
+	margin: 20px;
+}
+#main #flash{
+	max-width: 80%;
+	margin: 0 auto;
+}
+/* END Main */
+
+
+/* New post */
+#new-post{
+	margin: 0 auto;
+	width: 80%;
+}
+#new-post textarea{
+	display: block;
+	width: 100%;
+	min-height: 70%;
+	border: 1px solid #ccc;
+	outline: none;
+	font-size: 1em;
+	line-height: 1.6em;
+	padding: 5px;
+}
+/* END New post */
+
+
+/* Posts */
+#posts{
+	margin: 50px;
+}
+#posts .post{
+	background: #fff;
+	padding: 10px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #ccc;
+}
+/* END Posts */
