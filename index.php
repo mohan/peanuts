@@ -1,9 +1,11 @@
 <?php
+// Peanuts
 // License: GPL
 
-require_once './lib/csvdb-core.php';
+require_once './lib/csvdb.php';
 require_once './lib/helpers.php';
-require_once './lib/functions.php';
+require_once './app/data.php';
+require_once './app/functions.php';
 
 
 // filters
@@ -11,8 +13,8 @@ filter_set_config();
 filter_set_username();
 filter_set_flash();
 
-// csvdb
-csvdb_init();
+// data
+data_init();
 
 // Routes
 routes();
