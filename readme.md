@@ -47,6 +47,7 @@ Work in progress: true
 	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
 	* Counts are stored in post meta JSON.
 	* Guest post - guest name is stored in post meta.
+	* Post total view count - store in post meta.
 * Comments support markdown.
 * Likes/stars/emoji is stored as a comment.
 * Own markdown implementation with checklist support displayed as checkboxes.
