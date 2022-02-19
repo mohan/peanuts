@@ -1,6 +1,20 @@
 <?php
 global $csvdb_tables;
 $posts = csvdb_list($csvdb_tables['posts']);
+$sample_posts_table = [
+	"data_dir" => './',
+	"tablename" => 'sample_posts.csv',
+	"max_record_width" => 128,
+	"columns" => [
+			"username"=>"string",
+			"title"=>"string",
+			"body"=>"json"
+	],
+	"auto_timestamps" => true
+];
+
+$sample_posts = csvdb_list($sample_posts_table);
+$posts = array_merge($posts, $sample_posts);
 ?>
 
 <div id='posts'>

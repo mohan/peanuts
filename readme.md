@@ -3,7 +3,7 @@
 Discussion board for teams.
 
 
-License: GPL
+License: GPL (Free as in free peanuts.)
 
 Work in progress: true
 
@@ -46,6 +46,7 @@ Work in progress: true
 	* Quick Post in listing page. <= 128 chars insert into title; >= insert 128 into title, all in body; wit bottom String.length.
 	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
 	* Counts are stored in post meta JSON.
+	* Guest post - guest name is stored in post meta.
 * Comments support markdown.
 * Likes/stars/emoji is stored as a comment.
 * Own markdown implementation with checklist support displayed as checkboxes.
