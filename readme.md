@@ -11,7 +11,7 @@ Work in progress: true
 * PHP application.
 * No external database system needed. Uses built-in CSVDB.
 * *Only one team password*. No user passwords to remember.
-* Host it yourself on your LAN. (Ex: `php -S 0.0.0.0:8080`).
+* Host it yourself on your LAN. (Ex: `php -S 127.0.0.1:8080`).
 
 
 ## Note
@@ -43,7 +43,7 @@ Work in progress: true
 	* Posts listing page contains title, user, last-updated-at, likes/stars/emoji count, comments count.
 	* Sorting by title, created-at and updated-at, latest commented-on.
 	* Create new post page with title and body fields.
-	* Quick Post in listing page. <= 128 chars insert into title; >= insert 128 into title, all in body; wit bottom String.length.
+	* QuickPost in listing page. <= 128 chars insert into title; >= insert 128 into title & all in body; wit bottom String.length.
 	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
 	* Counts are stored in post meta JSON.
 	* Guest post - guest name is stored in post meta.
