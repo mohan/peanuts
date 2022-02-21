@@ -3,10 +3,11 @@
 // License: GPL
 
 
-function include_template($template_name, $html_container=true)
+function include_template($template_name, $args=[], $html_container=true)
 {
 	$template_path = "./templates/" . CONFIG_TEMPLATE . '/';
-	require_once './templates/' . CONFIG_TEMPLATE . '/functions.php';
+
+	extract($args, EXTR_SKIP);
 	include $template_path . ($html_container ? "index.php" : $template_name);
 }
 
@@ -17,9 +18,9 @@ function urlto_template_asset($uri)
 }
 
 
-function linkto($html, $uri, $args=[], $method='get', $class_attr='')
+function linkto($html, $uri, $args=[], $class_attr='', $method='get')
 {
-	return "<a href='" . urlto($uri, $args, $method, '&amp;') . "' class='$class_attr'>" . htmlentities($html) . "</a>";
+	echo "<a href='" . urlto($uri, $args, $method, '&amp;') . "' class='$class_attr'>" . htmlentities($html) . "</a>";
 }
 
 
@@ -48,6 +49,7 @@ function flash_set($html)
 	if($html) secure_cookie_set('flash', $html);
 }
 
+
 function flash_clear()
 {
 	cookie_delete('flash');
@@ -56,10 +58,11 @@ function flash_clear()
 
 function secure_cookie_set($name, $value)
 {
-	$_value  = $value . '%' . md5($name . '%' . $value . '%' . SECURE_HASH);
+	// <= 1/2 day; may expire at am/pm;
+	$authenticity = md5($name . '%' . $value . '%' . date('y-m-d-a') . '%' . SECURE_HASH);
 
-	// 20 minutes
-	setcookie($name, $_value, time() + 20 * 60, CONFIG_ROOT_URL);
+	// Expires end of session/browser close
+	setcookie($name, "$value%$authenticity", 0, CONFIG_ROOT_URL, '', false, true);
 }
 
 
@@ -68,14 +71,27 @@ function secure_cookie_get($name)
 	if(!isset($_COOKIE[$name])) return false;
 
 	$parts = explode('%', $_COOKIE[$name]);
+	$value = $parts[0];
+	$given_authenticity = $parts[1];
 
-	if($parts[1] != md5($name . '%' . $parts[0] . '%' . SECURE_HASH)) return false;
+	$authenticity = md5($name . '%' . $value . '%' . date('y-m-d-a') . '%' . SECURE_HASH);
 
-	return $parts[0];
+	if($given_authenticity != $authenticity) return false;
+
+	return $value;
 }
 
 
 function cookie_delete($name)
 {
 	setcookie($name, '', time() - 3600);
+}
+
+
+// Simple debug
+// Remember to remove all debugs
+function __d($arg, $exit=false)
+{
+	echo "<textarea class='input' style='height:300px;'>" . htmlentities(var_dump($arg, true)) . "</textarea>";
+	if($exit) exit;
 }

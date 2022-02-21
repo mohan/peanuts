@@ -2,6 +2,11 @@
 // Peanuts
 // License: GPL
 
+
+
+
+
+
 // 
 // Routes
 // 
@@ -11,6 +16,9 @@ function routes()
 	// Post requests
 	if(isset($_GET['post-uri'])){
 		switch ($_GET['post-uri']) {
+			case 'create-quick-post':
+				return action_create_quick_post();
+
 			case 'create-post':
 				return action_create_post();
 
@@ -28,10 +36,10 @@ function routes()
 	// Get requests
 	switch ($_GET['uri']) {
 		case 'new-post':
-			return include_template('new-post.php');
+			return get_new_post();
 
 		case 'posts':
-			return include_template('posts.php');
+			return get_posts();
 
 		case '404':
 			header404();
@@ -41,9 +49,19 @@ function routes()
 			return include_template('login.php');
 
 		default:
-			return redirectto('login');
+			return redirectto('posts');
 	}
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -66,17 +84,40 @@ function filter_set_config(){
 }
 
 
-function filter_set_username()
+
+// Permitted GET and POST params
+function filter_permitted_params()
 {
-	if($_GET['uri'] == 'login'){
-		cookie_delete('username');
+	$param_names = [ 'uri', 'post-uri', 'id' ];
+	foreach ($_GET as $key => $value) {
+		if(!in_array($key, $param_names)){
+			unset($_GET[$key]);
+			continue;
+		}
+
+		if($_GET['id']) $_GET['id'] = intval($_GET['id']);
 	}
 
+	$param_names = [ 'username', 'team_password', 'title', 'body', 'id' ];
+	foreach ($_POST as $key => $value) {
+		if(!in_array($key, $param_names)){
+			unset($_POST[$key]);
+			continue;
+		}
+
+		if($_POST['id']) $_POST['id'] = intval($_POST['id']);
+	}
+}
+
+
+
+function filter_set_username()
+{
 	$username = secure_cookie_get('username');
 
 	if(!$username && $_GET['uri'] != 'login'){
 		action_logout();
-	} else {
+	} elseif($username) {
 		secure_cookie_set('username', $username);
 		$_REQUEST['PEANUTS'] = [
 			'username' => $username,
@@ -101,8 +142,49 @@ function filter_set_flash()
 
 
 
+
+
+
+
+
+
+
+
+
 // 
-// Actions
+// Get functions
+// 
+
+function get_posts()
+{
+	include_template('posts.php', ['posts'=>data_post_list()]);
+}
+
+
+function get_new_post()
+{
+	include_template('new-post.php');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+// Post functions
 // 
 
 function action_login()
@@ -125,21 +207,23 @@ function action_logout()
 
 function action_create_post()
 {
-	global $csvdb_tables;
-
-	$ref = csvdb_text_create($csvdb_tables['posts'], 'body', $_POST['body']);
-	
-	$values = [
-		username => $_REQUEST['PEANUTS']['username'],
-		title => $_POST['title'],
-		body => $ref,
-	];
-
-	if(csvdb_create($csvdb_tables['posts'], $values)){
+	if(data_post_create()){
 		flash_set('New post created!');
 		redirectto('posts');
 	} else {
-		flash_set('Invalid values!');
-		redirectto('new-post');
+		flash_set('Invalid/missing values!');
+		get_new_post();
+	}
+}
+
+
+function action_create_quick_post()
+{
+	if(data_post_create()){
+		flash_set('New post created!');
+		redirectto('posts');
+	} else {
+		flash_set('Invalid/missing values!');
+		get_posts();
 	}
 }

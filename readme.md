@@ -17,7 +17,9 @@ Work in progress: true
 ## Note
 * **Not tested**, do not use.
 * Please feel free to implement it yourself.
-* Internet hosting is discouraged. Designed to be used as an internal application.
+* Internet hosting is discouraged.
+	* Built and designed to be used as an internal application in our unit.
+	* Less secure is enough, as it is hosted on LAN - Local Area Network.
 
 
 
@@ -43,7 +45,7 @@ Work in progress: true
 	* Posts listing page contains title, user, last-updated-at, likes/stars/emoji count, comments count.
 	* Sorting by title, created-at and updated-at, latest commented-on.
 	* Create new post page with title and body fields.
-	* QuickPost in listing page. <= 128 chars insert into title; >= insert 128 into title & all in body; wit bottom String.length.
+	* QuickPost in listing page. 128 characters maximum; insert into title; wit bottom String.length display.
 	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
 	* Counts are stored in post meta JSON.
 	* Guest post - guest name is stored in post meta.
@@ -67,3 +69,36 @@ Work in progress: true
 6. "We cook. We eat. We share recipe." - Peanuts team member
 7. "0 1 2 3 5 8 13 21 34 55 89 144 233 377." - Unknown
 8. "Marmalade." - Peanuts team member
+
+
+
+## Recipe
+
+### SweetPeanutMild++ v0.0.2
+
+Ingredients:
+* ~128 raw peanuts
+* 1.5  spoons vegetable oil
+* 1.5  spoons sugar
+* 1.5  spoons flour
+* ~16  spoons water
+
+Process:
+1. Roast peanuts in vegetable oil.
+2. Mix water, sugar and flour.
+3. Add syrup to roasted peanuts and stir until caramel is coated well.
+4. Enjoy SweetPeanutMild++ with your team.
+
+
+
+## References
+
+* SquirrelMail
+* WP
+* Rails
+* Django
+* Flask
+* ExpressJS
+* jQuery
+* Bootstrap
+* Git

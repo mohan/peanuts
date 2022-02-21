@@ -1,10 +1,9 @@
 <?php
-global $csvdb_tables;
-$posts = csvdb_list($csvdb_tables['posts']);
+// Remove these two lines to remove sample posts
 $sample_posts_table = [
 	"data_dir" => './',
 	"tablename" => 'sample_posts.csv',
-	"max_record_width" => 128,
+	"max_record_width" => 96,
 	"columns" => [
 			"username"=>"string",
 			"title"=>"string",
@@ -13,17 +12,28 @@ $sample_posts_table = [
 	"auto_timestamps" => true
 ];
 
-$sample_posts = csvdb_list($sample_posts_table);
-$posts = array_merge($posts, $sample_posts);
+$posts = array_merge($posts, csvdb_list($sample_posts_table));
 ?>
 
 <div id='posts'>
-	<?php foreach($posts as $r_id => $post): ?>
-		<div id='post-<?php echo $r_id; ?>' class='post'>
-			<h3><?php echo $post['title'];?></h3>
-			<p><?php echo csvdb_text_read($csvdb_tables['posts'], 'body', $post['body']); ?></p>
-			<h4><?php echo CONFIG_USERS[$post['username']];?></h4>
-			<p><?php echo date('F j, Y, g:i a', $post['created_at']);?></p>
+
+	<div class='border-bottom m-b'>
+		<div class='user-container'>
+			<h4 class='user-icon' style='margin-top:30px;'>
+				<?php echo user_initial($_REQUEST['PEANUTS']['username']);?>
+			</h4>
 		</div>
-	<?php endforeach; ?>
+		<form method='post' action='<?php echo urlto('create-post', ['redirect'=>urlto('posts')], 'post'); ?>' class='header-container'>
+			<label for='quickpost' class='d-block text-muted small'>QuickPost</label>
+			<textarea id='quickpost' name='title' class='input' style='height:100px;'><?php echo htmlentities($_POST['title']); ?></textarea>
+			<div id='quickpost-strlen' class='small text-muted'></div>
+			<input type='submit' value='Post' class='btn btn-primary' />
+		</form>
+	</div>
+
+	<?php
+		foreach($posts as $r_id => $post){
+			include $template_path . 'post.php';
+		}
+	?>
 </div>
