@@ -1,22 +1,22 @@
 <?php
 
-function pagetitle($uri)
+function pagetitle($uri, $args)
 {
 	switch ($uri) {
 		case 'login.php':
 			return 'Login - ' . CONFIG_APP_NAME;
 
+		case 'post.php':
+			$title = substr($args['post']['title'], 0, 20); break;
+
 		case 'posts.php':
-			$title = 'Posts';
-			break;
+			$title = 'Posts'; break;
 
 		case 'new-post.php':
-			$title = 'New Post';
-			break;
+			$title = 'New Post'; break;
 
 		case '404.php':
-			return '404 - ' . CONFIG_APP_NAME;
-			break;
+			return '404 - ' . CONFIG_APP_NAME; break;
 	}
 
 	return $title . ' - ' . CONFIG_TEAM_NAME;

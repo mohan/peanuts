@@ -6,13 +6,13 @@
 // CSVDB
 // 
 
-$csvdb_tables = [];
+$_csvdb_tables = [];
 
 function data_init()
 {
-	global $csvdb_tables;
+	global $_csvdb_tables;
 
-	$csvdb_tables['posts'] = [
+	$_csvdb_tables['posts'] = [
 		"data_dir" => CONFIG_DATA_DIR,
 		"tablename" => 'posts.csv',
 		"max_record_width" => 256,
@@ -25,11 +25,11 @@ function data_init()
 		"auto_timestamps" => true,
 	];
 
-	csvdb_create_table($csvdb_tables['posts']);
+	csvdb_create_table($_csvdb_tables['posts']);
 }
 
 
-function csvdb_posts_table_validations($r_id, $values, $t)
+function csvdb_posts_table_validations($r_id, $values)
 {
 	if(!$values['username'] || !$values['title'] ||
 		strlen($values['username']) > 20 ||
@@ -42,10 +42,29 @@ function csvdb_posts_table_validations($r_id, $values, $t)
 
 // Data read
 
-function data_post_list($page=1)
+function data_post_list($page, $per_page)
 {
-	global $csvdb_tables;
-	return csvdb_list($csvdb_tables['posts'], $page, 30, true);
+	global $_csvdb_tables;
+	return csvdb_list($_csvdb_tables['posts'], $page, $per_page, true);
+}
+
+
+function data_post($id)
+{
+	global $_csvdb_tables;
+	$post = csvdb_read($_csvdb_tables['posts'], $id);
+
+	if($post == -1) $post = false;
+	if($post) $post['body'] = csvdb_text_read($_csvdb_tables['posts'], 'body', $post['body']);
+
+	return $post;
+}
+
+
+function data_post_pages_max($per_page)
+{
+	global $_csvdb_tables;
+	return csvdb_last_r_id($_csvdb_tables['posts']) / $per_page;
 }
 
 
@@ -53,13 +72,15 @@ function data_post_list($page=1)
 
 function data_post_create()
 {
-	global $csvdb_tables;
+	global $_csvdb_tables;
+
+	$body_ref = $_POST['body'] ? csvdb_text_create($_csvdb_tables['posts'], 'body', $_POST['body']) : false;
 
 	$values = [
-		username => $_REQUEST['PEANUTS']['username'],
+		username => $_REQUEST['APP']['username'],
 		title => $_POST['title'],
-		body => $_POST['body']
+		body => $body_ref
 	];
 
-	return csvdb_create($csvdb_tables['posts'], $values);
+	return csvdb_create($_csvdb_tables['posts'], $values);
 }

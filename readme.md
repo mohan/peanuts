@@ -52,8 +52,8 @@ Work in progress: true
 	* Post total view count - store in post meta.
 * Comments support markdown.
 * Likes/stars/emoji is stored as a comment.
-* Own markdown implementation with checklist support displayed as checkboxes.
 * No external libraries.
+* No markdown rendering. Display raw.
 * No support for search.
 * No support for uploads/images. Instead post a link to an image.
 
@@ -99,6 +99,7 @@ Process:
 * Django
 * Flask
 * ExpressJS
+* Lumen
 * jQuery
 * Bootstrap
 * Git

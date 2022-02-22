@@ -17,7 +17,7 @@
 	require_once('./lib/helpers.php');
 	require_once('./app/functions.php');
 
-	filter_set_config();
+	filter_set_config('./config.ini');
 	filter_set_username();
 ?>
 <html>

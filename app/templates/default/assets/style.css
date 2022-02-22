@@ -163,6 +163,7 @@ label, .label{
 	overflow: hidden;
 	display: inline-block;
 	font-weight: normal;
+	text-align: center;
 }
 /* END User */
 
@@ -212,11 +213,11 @@ label, .label{
 }
 #posts .post h3{
 	font-size: 1em;
+	font-weight: normal;
 }
 #posts .user-container{
 	float: left;
 	width: 100px;
-	text-align: center;
 }
 #posts .header-container{
 	padding-left: 115px;
@@ -225,3 +226,22 @@ label, .label{
 	padding-top: 5px;
 }
 /* END Posts */
+
+
+
+/* Post */
+#post{
+	margin: 50px auto;
+	max-width: 1000px;
+}
+#post .user-icon{
+	margin-bottom: 0;
+}
+#post .title{
+	font-weight: normal;
+}
+#post .body{
+	font-size: 1.03em;
+	font-family: 'courier new';
+}
+/* END Post */
