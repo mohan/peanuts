@@ -3,45 +3,103 @@
 // License: GPL
 
 
-function include_template($template_name, $args=[], $html_container=true)
+function render($template_name, $args=[], $html_container='index.php')
 {
-	$template_path = './app/templates/' . CONFIG_TEMPLATE . '/';
+	$template_path = './' . APP_NAME . '/templates/' . APP_TEMPLATE . '/';
+	$uri = $_GET['uri'];
 
 	extract($args, EXTR_SKIP);
-	include $template_path . ($html_container ? "index.php" : $template_name);
+	include $template_path . ($html_container ? $html_container : $template_name);
 }
 
 
-function template_filepath($template_name)
+function render_partial($template_name, $args=[])
 {
-	$template_path = './app/templates/' . CONFIG_TEMPLATE . '/';
-	return $template_path . $template_name;
+	$template_path = './' . APP_NAME . '/templates/' . APP_TEMPLATE . '/';
+	
+	extract($args, EXTR_SKIP);
+	include $template_path . $template_name;
 }
 
 
 function urlto_template_asset($uri)
 {
-	return CONFIG_ROOT_URL . 'app/templates/' . CONFIG_TEMPLATE . '/assets/' . $uri;
+	return CONFIG_ROOT_URL . APP_NAME . '/templates/' . APP_TEMPLATE . '/assets/' . $uri;
 }
 
 
-function linkto($html, $uri, $args=[], $class_attr='', $method='get')
+function formto($uri, $args=[], $attrs=[])
 {
-	echo "<a href='" . urlto($uri, $args, $method, '&amp;') . "' class='$class_attr'>" . htmlentities($html) . "</a>";
+	$url = urltopost($uri, $args);
+
+	$attrs_str = '';
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "'";
+
+	echo "<form method='post' action='$url' $attrs_str>";
 }
 
 
-function urlto($uri, $args=[], $method='get', $arg_separator='&')
+function linkto($uri, $html, $args=[], $attrs=[])
 {
-	$uri_arg = ($method == 'post' ? 'post-uri=' : 'uri=') . $uri;
-	$args_str = $args ? http_build_query($args, '', $arg_separator) : NULL;
-	return CONFIG_ROOT_URL . '?' . $uri_arg . ($args_str ? $arg_separator : '') . $args_str;
+	$url = urltoget($uri, $args, '&amp;');
+	
+	$attrs_str = '';
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
+
+	echo "<a href='$url' $attrs_str>" . htmlentities($html) . "</a>";
 }
+
+
+function urltoget($uri, $args=[], $arg_separator='&')
+{
+	$args['uri'] = $uri;
+	$hash = isset($args['__hash']) ? '#' . $args['__hash'] : '';
+	unset($args['__hash']);
+
+	return CONFIG_ROOT_URL . '?' . http_build_query($args, '', $arg_separator) . $hash;
+}
+
+
+function urltopost($uri, $args=[], $arg_separator='&')
+{
+	$args['post_uri'] = $uri;
+	return CONFIG_ROOT_URL . '?' . http_build_query($args, '', $arg_separator);
+}
+
+
+// Auto htmlentities for safe user input
+function tag($html, $attrs=[], $name='div', $closing=true)
+{
+	if($name != 'input' && $name != 'textarea' && !$html) return;
+
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
+	
+	echo "<$name $attrs_str";
+
+	if($name != 'input'){
+		echo ">" . htmlentities($html);
+		if($closing) echo "</$name>";
+	} else {
+		echo "value='" . htmlentities($html) . "'";
+		echo " />";
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 function redirectto($uri, $args=[])
 {
-	header('Location: ' . urlto($uri, $args));
+	header('Location: ' . urltoget($uri, $args));
 }
 
 
@@ -51,10 +109,23 @@ function header404()
 }
 
 
+function get_404()
+{
+	render('404.php');
+}
+
+
+
+
+
+
+
+
+
 function flash_set($html, $in_current_request=false)
 {
 	if($html) {
-		if($in_current_request) $_REQUEST['APP']['flash'] = $html;
+		if($in_current_request) $_REQUEST['flash'] = $html;
 		else secure_cookie_set('flash', $html);
 	}
 }
@@ -98,6 +169,19 @@ function cookie_delete($name)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Simple debug
 // Remember to remove all debugs
 function __d($arg, $exit=false)
@@ -128,8 +212,8 @@ function __d($arg, $exit=false)
 // Max action name 32 chars
 function filter_routes($get_action_names, $post_action_names)
 {
-	if( is_string($_GET['post-uri']) && strlen($_GET['post-uri']) < 32 && in_array($_GET['post-uri'], $post_action_names)){
-		return call_user_func( 'post_' . preg_replace("/[^a-zA-Z0-9]/", '_', $_GET['post-uri']));
+	if( is_string($_GET['post_uri']) && strlen($_GET['post_uri']) < 32 && in_array($_GET['post_uri'], $post_action_names)){
+		return call_user_func( 'post_' . preg_replace("/[^a-zA-Z0-9]/", '_', $_GET['post_uri']));
 	}
 
 	if( is_string($_GET['uri']) && strlen($_GET['uri']) < 32 && in_array($_GET['uri'], $get_action_names)){
@@ -140,8 +224,8 @@ function filter_routes($get_action_names, $post_action_names)
 }
 
 
-// Permitted GET and POST params, with typecasting
-function filter_permitted_params($get_param_names, $post_param_names, $get_typecasts, $post_typecasts)
+// Permitted GET, POST, cookie params, with typecasting
+function filter_permitted_params($get_param_names, $post_param_names, $cookie_param_names, $get_typecasts, $post_typecasts)
 {
 	foreach ($_GET as $key => $value) {
 		if(!in_array($key, $get_param_names)) unset($_GET[$key]);
@@ -149,6 +233,10 @@ function filter_permitted_params($get_param_names, $post_param_names, $get_typec
 
 	foreach ($_POST as $key => $value) {
 		if(!in_array($key, $post_param_names)) unset($_POST[$key]);
+	}
+
+	foreach ($_COOKIE as $key => $value) {
+		if(!in_array($key, $cookie_param_names)) unset($_COOKIE[$key]);
 	}
 
 	foreach ($get_typecasts as $name => $type) {
@@ -186,7 +274,7 @@ function filter_set_flash()
 	$flash = secure_cookie_get('flash');
 
 	if($flash){
-		$_REQUEST['APP']['flash'] = $flash;
+		$_REQUEST['flash'] = $flash;
 		cookie_delete('flash');
 	}
 }

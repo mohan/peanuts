@@ -1,16 +1,16 @@
-<div id='post-<?php echo $r_id; ?>' class='post clear'>
+<div id='post-<?= $post['id']; ?>' class='post clear'>
 	<div class='user-container'>
-		<h4 class='user-icon'>
-			<?php echo user_initial($post['username']);?>
-		</h4>
+		<?php tag(user_initial($post['username']), ['class'=>'user-icon'], 'h4'); ?>
 	</div>
 	<div class='header-container'>
 		<h3>
-			<?php linkto($post['title'], "post", [id=>$post['r_id']], 'd-block');?>
+			<a href='<?= urltoget('post', [id=>$post['id']]); ?>' class='d-block'>
+				<?= nl2br(htmlentities($post['title'])); ?>
+			</a>
 		</h3>
 		<p class='small text-muted'>
-			<?php echo CONFIG_USERS[$post['username']]; ?> /
-			<?php echo date('M j, Y, g:i a', $post['created_at']);?>
+			<?= CONFIG_USERS[$post['username']]; ?> /
+			<?= date('M j, Y, g:i a', $post['created_at']);?>
 		</p>
 	</div>
 </div>

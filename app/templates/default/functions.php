@@ -4,7 +4,7 @@ function pagetitle($uri, $args)
 {
 	switch ($uri) {
 		case 'login.php':
-			return 'Login - ' . CONFIG_APP_NAME;
+			return 'Login - ' . CONFIG_APP_TITLE;
 
 		case 'post.php':
 			$title = substr($args['post']['title'], 0, 20); break;
@@ -16,7 +16,7 @@ function pagetitle($uri, $args)
 			$title = 'New Post'; break;
 
 		case '404.php':
-			return '404 - ' . CONFIG_APP_NAME; break;
+			return '404 - ' . CONFIG_APP_TITLE; break;
 	}
 
 	return $title . ' - ' . CONFIG_TEAM_NAME;

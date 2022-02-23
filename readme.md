@@ -30,30 +30,27 @@ Work in progress: true
 * Password protected. Team password only. No user password.
 * Team members write posts.
 * Team members comment on posts.
-* Nested comments are supported.
 * Markdown support.
 * Shortcore support. Example: [calendar year=yyyy month=mm mark=16].
-* Likes/stars/emoji support.
+* Vote up/down support.
 * Banner post.
 * Sticky posts.
-* Login page banner text.
 * Notification panel for new comments for current user posts.
 * Multi-team support, with a single installation.
 	* Primary team can be used for posts between all teams.
 	* Individual teams post in their team board.
 * Posts contain title and body fields only.
-	* Posts listing page contains title, user, last-updated-at, likes/stars/emoji count, comments count.
-	* Sorting by title, created-at and updated-at, latest commented-on.
+	* Posts listing page contains title, user, last-updated-at, vote up/down count, comments count.
 	* Create new post page with title and body fields.
-	* QuickPost in listing page. 128 characters maximum; insert into title; wit bottom String.length display.
+	* QuickPost in listing page. 128 characters maximum; insert into title; with bottom String.length display.
 	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
 	* Counts are stored in post meta JSON.
 	* Guest post - guest name is stored in post meta.
 	* Post total view count - store in post meta.
 * Comments support markdown.
-* Likes/stars/emoji is stored as a comment.
+* Vote up/down is stored as a comment.
 * No external libraries.
-* No markdown rendering. Display raw.
+* No markdown rendering. Display raw. (Exceptions: text styles, table)
 * No support for search.
 * No support for uploads/images. Instead post a link to an image.
 

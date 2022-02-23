@@ -4,18 +4,18 @@
 		!in_array($_GET['file'], [
 			'readme.md',
 
-			'help/markdown.md',
+			'app/help/markdown.md',
 
 			'lib/helpers.php',
 			'lib/csvdb.php',
-			'app/functions.php',
+			'app/actions.php',
 			'app/data.php',
 			'index.php',
 		])
 	) exit;
 
 	require_once('./lib/helpers.php');
-	require_once('./app/functions.php');
+	require_once('./app/actions.php');
 
 	filter_set_config('./config.ini');
 	filter_set_username();
@@ -41,7 +41,7 @@
 			<li>
 				Help
 				<ul>
-					<li><a href='?file=help/markdown.md'>markdown.md</a></li>
+					<li><a href='?file=app/help/markdown.md'>markdown.md</a></li>
 				</ul>
 			</li>
 			<li>
@@ -49,13 +49,13 @@
 				<ul>
 					<li><a href='?file=lib/helpers.php'>lib/helpers.php</a></li>
 					<li><a href='?file=lib/csvdb.php'>lib/csvdb.php</a></li>
-					<li><a href='?file=app/functions.php'>app/functions.php</a></li>
+					<li><a href='?file=app/actions.php'>app/actions.php</a></li>
 					<li><a href='?file=app/data.php'>app/data.php</a></li>
 					<li><a href='?file=index.php'>index.php</a></li>
 				</ul>
 			</li>
 		</ul>
-		<h2><?php echo $_GET['file']; ?></h2>
+		<h2><?php echo basename($_GET['file']); ?></h2>
 		<pre class='sourcecode'><?php echo sourcecode(htmlentities(file_get_contents('./' . $_GET['file']))); ?></pre>
 	</div>
 </body>

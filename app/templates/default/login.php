@@ -1,12 +1,12 @@
 <div id='login' class='panel'>
-	<h1 class='heading'><?php echo CONFIG_APP_TITLE;?></h1>
-	<form class='body' method='post' action='<?php echo urlto('login', NULL, 'post');?>'>
+	<?php tag(CONFIG_APP_TITLE, ['class'=>'heading'], 'h1');?>
+	<?= formto('login', NULL, ['class'=>'body']); ?>
 		<?php if(CONFIG_MULTI_TEAMS): ?>
 			<select name='teamname' class='input'>
 				<option disabled selected>Select Team</option>
 				<option value='primary'>Primary Team</option>
 				<?php foreach (CONFIG_TEAMS as $teamname_key => $teamname): ?>
-					<option value='<?php echo $teamname_key;?>'><?php echo $teamname; ?></option>
+					<?php tag($teamname, ['value'=>$teamname_key], 'option'); ?>
 				<?php endforeach; ?>
 			</select>
 		<?php endif; ?>

@@ -1,36 +1,34 @@
 <html>
 <head>
-	<title><?php echo pagetitle($template_name, $args); ?></title>
-	<link rel="stylesheet" type="text/css" href="<?php echo urlto_template_asset('style.css'); ?>" />
+	<title><?= pagetitle($template_name, $args); ?></title>
+	<link rel="stylesheet" type="text/css" href="<?= urlto_template_asset('style.css'); ?>" />
 </head>
-<body>
-	<?php if($_GET['uri'] == 'login'): ?>
+<body class='<?= $uri ;?> <?= $post_uri ;?>'>
+	<?php if($uri == 'login'): ?>
 	
-		<?php include template_filepath($template_name); ?>
+		<?php render_partial('login.php'); ?>
 	
 	<?php else: ?>
 
 		<div id='navbar' class='clear'>
 			<div id='navbar-left'>
-				<h1><?php linkto(CONFIG_TEAM_NAME, 'posts'); ?></h1>
-				<?php linkto('New Post', 'new-post', NULL, 'btn btn-primary'); ?>
+				<h1><?php linkto('posts', CONFIG_TEAM_NAME); ?></h1>
+				<?php linkto('new-post', 'New Post', NULL, ['class' => 'btn btn-primary']); ?>
 			</div>
 			<div id='navbar-right'>
-				<?php echo CONFIG_USERS[$_REQUEST['APP']['username']]; ?>
-				<form method='post' action='<?php echo urlto('logout', NULL, 'post'); ?>'>
+				<?php tag(CONFIG_USERS[$_REQUEST['username']], ['class'=>'text-dark medium'], 'span'); ?>
+				<?= formto('logout'); ?>
 					<button class='btn btn-muted'>Logout</button>
 				</form>
 			</div>
 		</div>
 		<div id='main'>
-			<?php if($_REQUEST['APP']['flash']): ?>
-				<div id='flash' class='text-center'><?php echo htmlentities($_REQUEST['APP']['flash']); ?></div>
-			<?php endif; ?>
-			<?php include template_filepath($template_name); ?>
+			<?php tag($_REQUEST['flash'], ['id'=>'flash', 'class'=>'text-center']); ?>
+			<?php render_partial($template_name, $args); ?>
 		</div>
 	
 	<?php endif; ?>
 
-	<script type="text/javascript" src='<?php echo urlto_template_asset('main.js'); ?>'></script>
+	<script type="text/javascript" src='<?= urlto_template_asset('main.js'); ?>'></script>
 </body>
 </html>
