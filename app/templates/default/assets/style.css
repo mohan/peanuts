@@ -28,16 +28,24 @@ label, .label{
 }
 
 .btn{
-	font-size: 0.7em;
 	border-radius: 4px;
 	background: #ccc;
 	padding: 5px 10px;
 	border: 0;
 }
 
+.btn-sm{
+	font-size: 0.7em;
+}
+
 .btn.btn-primary{
 	background: #0000ee;
 	color: #fff;
+}
+
+.btn.btn-light{
+	background: #e0e0e0;
+	color: #000;
 }
 
 .btn.btn-muted{
@@ -52,13 +60,24 @@ label, .label{
 	outline: none;
 	font-size: 1em;
 	font-family: 'courier new', courier;
-	line-height: 1.6em;
+	line-height: 1.8em;
 	padding: 20px;
+	tab-size: 4;
+}
+
+#post-title-editor{
+	height: 20px;
+	padding: 10px 20px;
+	letter-spacing: 1px;
+	font-family: georgia, 'courier new', courier;
 }
 
 .markdown{
 	font-size: 1.03em;
 	font-family: 'courier new', courier;
+	tab-size: 4;
+	white-space: break-spaces;
+	line-height: 1.8em;
 }
 
 
@@ -134,8 +153,9 @@ label, .label{
 /* Navbar */
 #navbar{
 	background: #dedede;
-	padding: 10px 20px 8px 20px;
+	padding: 12px 20px 12px 20px;
 	border-bottom: 1px solid #d9d9d9;
+	margin-bottom: 50px;
 }
 #navbar form{
 	display: inline;
@@ -146,8 +166,15 @@ label, .label{
 }
 #navbar-left h1{
 	font-size: 1.1em;
-	margin: 2px 25px 0 0;
+	margin: 2px 10px 0 0;
 	display: inline-block;
+}
+#navbar-left #navbar-links{
+	margin-left: 30px;
+	font-size: 0.8em;
+}
+#navbar-left #navbar-links a{
+	color: #333;
 }
 #navbar-right{
 	float: right;
@@ -196,7 +223,7 @@ label, .label{
 	font-size: 1.2em;
 }
 #post-body-editor{
-	height: 70%;
+	height: 500px;
 }
 #new-post label, #new-post label a{
 	color: #888;
@@ -224,8 +251,12 @@ label, .label{
 	border-radius: 5px;
 }
 #posts .post h3{
-	font-size: 1em;
+	margin: 0;
+}
+#posts .post h3 pre{
+	font-size: 0.88em;
 	font-weight: normal;
+	font-family: georgia, 'courier new', courier;
 }
 #posts .post h3 a{
 	text-decoration: none;
@@ -260,8 +291,9 @@ body.post{
 #post .user-icon{
 	margin-bottom: 0;
 }
-#post .title{
-	font-weight: normal;
+#post .title pre{
+	letter-spacing: 1px;
+	font-family: georgia, 'courier new', courier;
 }
 #post .title a{
 	text-decoration: none;
@@ -287,3 +319,12 @@ body.post{
 	padding-left: 115px;
 }
 /* END comments */
+
+
+
+/* Hashtags */
+#hashtags{
+	margin: 0 auto;
+	max-width: 1000px;
+}
+/* End Hashtags */

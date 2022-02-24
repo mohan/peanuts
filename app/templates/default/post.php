@@ -3,9 +3,12 @@
 		<?php tag(user_initial($post['username']), ['class'=>'user-icon'], 'h4'); ?>
 		<h3 class='title'>
 			<a href='<?= urltoget('post', [id=>$post['id']]); ?>' class='d-block'>
-				<?= nl2br(htmlentities($post['title'])); ?>
+				<?= tag($post['title'], ['class'=>'markdown'], 'pre') ?>
 			</a>
 		</h3>
+
+		<?php tag($post['body'], ['class'=>'markdown'], 'pre'); ?>
+
 		<p class='small text-muted'>
 			<?= CONFIG_USERS[$post['username']]; ?> /
 			<?= date('M j, Y, g:i a', $post['created_at']);?>
@@ -15,12 +18,10 @@
 				}
 			?>
 		</p>
-
-		<?php tag($post['body'], ['class'=>'markdown'], 'pre'); ?>
 	</div>
 
 	<div id='comments'>
-		<h2>Comments</h2>
+		<h3>Comments</h3>
 		<?= formto('create-comment', ['id' => $id], ['class'=>'header-container']); ?>
 			<label for='comment-body-editor' class='d-block text-muted small'>Add Comment</label>
 			<?php tag($body, ['id'=>'comment-body-editor', 'name'=>'body', 'class'=>'editor', 'style'=>'height:100px'], 'textarea'); ?>

@@ -13,12 +13,15 @@
 		<div id='navbar' class='clear'>
 			<div id='navbar-left'>
 				<h1><?php linkto('posts', CONFIG_TEAM_NAME); ?></h1>
-				<?php linkto('new-post', 'New Post', NULL, ['class' => 'btn btn-primary']); ?>
+				<?php linkto('new-post', 'New Post', NULL, ['class' => 'btn btn-primary btn-sm']); ?>
+				<span id='navbar-links'>
+					<?php linkto('hashtags', 'Hashtags', NULL, ['class' => '']); ?>
+				</span>
 			</div>
 			<div id='navbar-right'>
 				<?php tag(CONFIG_USERS[$_REQUEST['username']], ['class'=>'text-dark medium'], 'span'); ?>
 				<?= formto('logout'); ?>
-					<button class='btn btn-muted'>Logout</button>
+					<button class='btn btn-sm btn-muted'>Logout</button>
 				</form>
 			</div>
 		</div>

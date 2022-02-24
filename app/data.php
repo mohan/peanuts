@@ -6,14 +6,10 @@
 // CSVDB
 // 
 
-$_csvdb_table_posts = [];
-$_csvdb_table_comments = [];
 
-function data_init()
+function data_table_posts()
 {
-	global $_csvdb_table_posts, $_csvdb_table_comments;
-
-	$_csvdb_table_posts = [
+	static $t = [
 		'data_dir' => CONFIG_DATA_DIR,
 		'tablename' => 'posts.csv',
 		'max_record_width' => 256,
@@ -24,12 +20,18 @@ function data_init()
 			'meta' => 'json'			// 40
 		],
 		'validations_callback' => '_posts_table_validations',
-		'auto_timestamps' => true		// 20
+		'auto_timestamps' => true,		// 20
 	];
 
-	$_csvdb_table_comments = [
+	return $t;
+}
+
+
+function data_table_comments($post_id)
+{
+	static $t = [
 		'data_dir' => CONFIG_DATA_DIR,
-		'tablename' => 'comments.csv',
+		'tablename' => '',
 		'max_record_width' => 160,
 		'columns' => [
 			'username' => 'string',		// 20
@@ -41,6 +43,10 @@ function data_init()
 		'validations_callback' => '_comments_table_validations',
 		'auto_timestamps' => true		// 20
 	];
+
+	$t['tablename'] = "post-$post_id-comments.csv";
+
+	return $t;
 }
 
 
@@ -81,17 +87,17 @@ function _comments_table_validations($id, $values)
 
 function data_post_list($page, $per_page)
 {
-	global $_csvdb_table_posts;
-	return csvdb_list($_csvdb_table_posts, ['id', 'username', 'title', 'meta'], true, $page, $per_page);
+	$t = data_table_posts();
+	return csvdb_list($t, ['id', 'username', 'title', 'meta'], true, $page, $per_page);
 }
 
 
 function data_post_read($id, $columns=[])
 {
-	global $_csvdb_table_posts;
-	$post = csvdb_read($_csvdb_table_posts, $id, $columns);
+	$t = data_table_posts();
+	$post = csvdb_read($t, $id, $columns);
 	
-	if($post['body']) csvdb_text_fill_record($_csvdb_table_posts, ['body'], $post);
+	if($post['body']) csvdb_text_fill_record($t, ['body'], $post);
 
 	return $post;
 }
@@ -99,8 +105,32 @@ function data_post_read($id, $columns=[])
 
 function data_post_pages_max($per_page)
 {
-	global $_csvdb_table_posts;
-	return csvdb_last_id($_csvdb_table_posts) / $per_page;
+	$t = data_table_posts();
+	return csvdb_last_id($t) / $per_page;
+}
+
+
+function data_post_hashtags($hashtag)
+{
+	$t = data_table_posts();
+	$posts = csvdb_list($t, ['id', 'username', 'title', 'meta']);
+
+	$hashtags = [];
+	foreach ($posts as $key => $post) {
+		if(preg_match_all("/#([a-zA-Z0-9-_]+)/", $post['title'], $matches) && sizeof($matches[1]) > 0){
+			$hashtags = array_merge($hashtags, $matches[1]);
+		}
+
+		if($hashtag) {
+			if(strpos($post['title'], "#$hashtag") === false) unset($posts[$key]);
+		}
+	}
+
+	if($hashtag){
+		return ['hashtags' => $hashtags, 'hashtag' => $hashtag, 'posts' => $posts];
+	} else {
+		return ['hashtags' => $hashtags];
+	}
 }
 
 
@@ -108,31 +138,29 @@ function data_post_pages_max($per_page)
 
 function data_post_create($username, $title, $body)
 {
-	global $_csvdb_table_posts;
-
+	$t = data_table_posts();
 	$values = [
 		'username' => $username,
 		'title' => $title,
-		'body' => csvdb_text_create($_csvdb_table_posts, 'body', $body)
+		'body' => csvdb_text_create($t, 'body', $body)
 	];
 
-	return csvdb_create($_csvdb_table_posts, $values);
+	return csvdb_create($t, $values);
 }
 
 
 function data_post_update($id, $title, $body)
 {
-	global $_csvdb_table_posts;
-
-	$record = csvdb_read($_csvdb_table_posts, $id, ['body']);
+	$t = data_table_posts();
+	$record = csvdb_read($t, $id, ['body']);
 	if(!$record) return false;
 
 	$values = [
 		'title' => $title,
-		'body' => csvdb_text_update($_csvdb_table_posts, 'body', $record['body'], $body)
+		'body' => csvdb_text_update($t, 'body', $record['body'], $body)
 	];
 
-	return csvdb_update($_csvdb_table_posts, $id, $values);
+	return csvdb_update($t, $id, $values);
 }
 
 
@@ -152,11 +180,15 @@ function data_post_update($id, $title, $body)
 
 function data_comment_list($post_id)
 {
-	global $_csvdb_table_comments;
-	_data_set_comments_tablename($post_id);
+	$t = data_table_comments($post_id);
+	$records = csvdb_list($t, [], true, 1, -1);
+	
+	// Remove no text records, used for short_char/metadata.
+	foreach ($records as $key => $record) {
+		if(!$record['body']) unset($records[$key]);
+	}
 
-	$records = csvdb_list($_csvdb_table_comments, [], true, 1, -1);
-	csvdb_text_fill_records($_csvdb_table_comments, ['body'], $records);
+	csvdb_text_fill_records($t, ['body'], $records);
 
 	return $records;
 }
@@ -164,11 +196,11 @@ function data_comment_list($post_id)
 
 function data_comment_read($post_id, $id, $columns=[])
 {
-	global $_csvdb_table_comments;
-	_data_set_comments_tablename($post_id);
-	$comment = csvdb_read($_csvdb_table_comments, $id, $columns);
+	$t = data_table_comments($post_id);
+	$comment = csvdb_read($t, $id, $columns);
+	$comment['post_id'] = $post_id;
 	
-	if($comment['body']) csvdb_text_fill_record($_csvdb_table_comments, ['body'], $comment);
+	if($comment['body']) csvdb_text_fill_record($t, ['body'], $comment);
 
 	return $comment;
 }
@@ -176,43 +208,26 @@ function data_comment_read($post_id, $id, $columns=[])
 
 function data_comment_create($username, $post_id, $body)
 {
-	global $_csvdb_table_comments;
-	_data_set_comments_tablename($post_id);
-
+	$t = data_table_comments($post_id);
 	$values = [
 		'username' => $username,
-		'body' => csvdb_text_create($_csvdb_table_comments, 'body', $body)
+		'body' => csvdb_text_create($t, 'body', $body)
 	];
 
-	return csvdb_create($_csvdb_table_comments, $values);
+	return csvdb_create($t, $values);
 }
 
 
 function data_comment_update($post_id, $id, $body)
 {
-	global $_csvdb_table_comments;
-	_data_set_comments_tablename($post_id);
-
-	$record = csvdb_read($_csvdb_table_comments, $id, ['body']);
+	$t = data_table_comments($post_id);
+	$record = csvdb_read($t, $id, ['body']);
 	if(!$record) return false;
 
 	$values = [
-		'body' => csvdb_text_update($_csvdb_table_comments, 'body', $record['body'], $body)
+		'body' => csvdb_text_update($t, 'body', $record['body'], $body)
 	];
 
-	return csvdb_update($_csvdb_table_comments, $id, $values);
+	return csvdb_update($t, $id, $values);
 }
 
-
-
-
-
-// 
-// Internal
-// 
-
-function _data_set_comments_tablename($post_id)
-{
-	global $_csvdb_table_comments;
-	$_csvdb_table_comments['tablename'] = "post-$post_id-comments.csv";
-}

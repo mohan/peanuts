@@ -5,7 +5,9 @@
 			<?php tag(user_initial($_REQUEST['username']), ['class'=>'user-icon', 'style'=>'margin-top:30px;'], 'h4'); ?>
 		</div>
 		<?= formto('create-quick-post', NULL, ['class'=>'header-container']); ?>
-			<label for='quickpost-editor' class='d-block text-muted small'>QuickPost</label>
+			<label for='quickpost-editor' class='d-block text-muted small'>
+				QuickPost (<?php linkto('hashtags', 'Hashtags', [], ['class'=>'text-muted']); ?>)
+			</label>
 			<?php tag($_POST['title'], ['name'=> 'title', 'id'=>'quickpost-editor', 'class'=>'input', 'style'=>'height:100px;'], 'textarea'); ?>
 			<div id='quickpost-strlen' class='small text-muted'></div>
 			<input type='submit' value='Post' class='btn btn-primary' />

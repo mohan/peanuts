@@ -5,7 +5,7 @@
 	<div class='header-container'>
 		<h3>
 			<a href='<?= urltoget('post', [id=>$post['id']]); ?>' class='d-block'>
-				<?= nl2br(htmlentities($post['title'])); ?>
+				<?= tag($post['title'], ['class'=>'markdown'], 'pre') ?>
 			</a>
 		</h3>
 		<p class='small text-muted'>

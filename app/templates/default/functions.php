@@ -9,11 +9,17 @@ function pagetitle($uri, $args)
 		case 'post.php':
 			$title = substr($args['post']['title'], 0, 20); break;
 
+		case 'hashtags.php':
+			$title = 'Hashtags'; break;
+
 		case 'posts.php':
 			$title = 'Posts'; break;
 
-		case 'new-post.php':
-			$title = 'New Post'; break;
+		case 'post-editor.php':
+			$title = $args['id'] ? 'Edit Post #' . $args['id'] : 'New Post'; break;
+
+		case 'comment-editor.php':
+			$title = 'Edit Comment #' . $args['id']; break;
 
 		case '404.php':
 			return '404 - ' . CONFIG_APP_TITLE; break;

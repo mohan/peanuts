@@ -8,23 +8,57 @@
 
 function filter_set_username()
 {
-	$username = secure_cookie_get('username');
+	// Exclude login check
+	if($_GET['uri'] == 'login' ||
+		$_GET['post_uri'] == 'login'
+	) return;
 
-	if(!$username && $_GET['uri'] != 'login'){
-		post_logout();
-	} elseif($username) {
-		secure_cookie_set('username', $username);
+	$username = secure_cookie_get('u');
+
+	if($username){
+		// Update cookie authenticity
+		secure_cookie_set('u', $username);
+
+		// Set request username
 		$_REQUEST['username'] = $username;
 		$_REQUEST['teamname'] = NULL;
+	} else {
+		redirectto('login');
 	}
 }
 
 
 
+// 
+// Login
+// 
 
 
 
+function get_login()
+{
+	render('login.php');
+}
 
+
+function post_login()
+{
+	extract($_POST);
+
+	if(array_key_exists($username, CONFIG_USERS) && md5($team_password) == CONFIG_TEAM_PASSWORD){
+		secure_cookie_set('u', $username);
+		redirectto('posts');
+	} else {
+		redirectto('login');
+	}
+}
+
+
+function post_logout()
+{
+	cookie_delete('u');
+	redirectto('login');
+}
 
 
 
@@ -40,16 +74,15 @@ function filter_set_username()
 // Get functions
 // 
 
-function get_login()
+function get_root()
 {
-	return render('login.php');
+	redirectto('posts');
 }
 
 
 function get_posts()
 {
 	extract($_GET);
-	extract($_POST);
 
 	$page = $page ? $page : 1;
 	$per_page = 30;
@@ -62,7 +95,6 @@ function get_posts()
 function get_post()
 {
 	extract($_GET);
-	extract($_POST);
 
 	$post = data_post_read($id);
 	if(!$post) return get_404();
@@ -105,6 +137,12 @@ function get_edit_comment()
 }
 
 
+function get_hashtags()
+{
+	extract($_GET);
+
+	render('hashtags.php', data_post_hashtags($hashtag));
+}
 
 
 
@@ -124,27 +162,10 @@ function get_edit_comment()
 // Post functions
 // 
 
-function post_login()
-{
-	if(array_key_exists($_POST['username'], CONFIG_USERS) && md5($_POST['team_password']) == CONFIG_TEAM_PASSWORD){
-		secure_cookie_set('username', $_POST['username']);
-		redirectto('posts');
-	} else {
-		redirectto('login');
-	}
-}
-
-
-function post_logout()
-{
-	cookie_delete('username');
-	redirectto('login');
-}
-
 
 function post_create_post()
 {
-	extract($_POST);
+	extract($_REQUEST);
 
 	if(data_post_create( $_REQUEST['username'], $title, $body )){
 		flash_set('New post created!');
@@ -158,7 +179,7 @@ function post_create_post()
 
 function post_create_quick_post()
 {
-	extract($_POST);
+	extract($_REQUEST);
 
 	if(data_post_create( $_REQUEST['username'], $title, false )){
 		flash_set('New post created!');
@@ -174,8 +195,7 @@ function post_update_post()
 {
 	_check_if_current_user_can_edit_post();
 
-	extract($_GET);
-	extract($_POST);
+	extract($_REQUEST);
 
 	if(data_post_update( $id, $title, $body )){
 		flash_set('Post updated!');
@@ -189,8 +209,7 @@ function post_update_post()
 
 function post_create_comment()
 {
-	extract($_GET);
-	extract($_POST);
+	extract($_REQUEST);
 
 	if(data_comment_create( $_REQUEST['username'], $id, $body )){
 		redirectto('post', ['id'=>$id, '__hash'=>'comments']);
@@ -205,8 +224,7 @@ function post_update_comment()
 {
 	_check_if_current_user_can_edit_comment();
 
-	extract($_GET);
-	extract($_POST);
+	extract($_REQUEST);
 
 	if(data_comment_update( $post_id, $id, $body )){
 		flash_set('Comment updated!');
@@ -232,7 +250,6 @@ function _check_if_current_user_can_edit_post()
 	$current_post_record = data_post_read($id, ['username']);
 	if($current_post_record['username'] != $_REQUEST['username']) {
 		get_404();
-		exit();
 	}
 }
 
@@ -244,6 +261,5 @@ function _check_if_current_user_can_edit_comment()
 	$current_comment_record = data_comment_read($post_id, $id, ['username']);
 	if($current_comment_record['username'] != $_REQUEST['username']) {
 		get_404();
-		exit();
 	}
 }

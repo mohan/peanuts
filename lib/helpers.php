@@ -9,7 +9,8 @@ function render($template_name, $args=[], $html_container='index.php')
 	$uri = $_GET['uri'];
 
 	extract($args, EXTR_SKIP);
-	include $template_path . ($html_container ? $html_container : $template_name);
+	include $template_path . $html_container;
+	exit;
 }
 
 
@@ -100,17 +101,13 @@ function tag($html, $attrs=[], $name='div', $closing=true)
 function redirectto($uri, $args=[])
 {
 	header('Location: ' . urltoget($uri, $args));
-}
-
-
-function header404()
-{
-	header("HTTP/1.1 404 Not Found");
+	exit;
 }
 
 
 function get_404()
 {
+	header("HTTP/1.1 404 Not Found");
 	render('404.php');
 }
 
@@ -157,6 +154,7 @@ function secure_cookie_get($name)
 
 	$authenticity = md5($name . '%' . $value . '%' . date('y-m-d-a') . '%' . SECURE_HASH);
 
+	// Todo: If it fails, check if it matches -6
 	if($given_authenticity != $authenticity) return false;
 
 	return $value;
@@ -212,31 +210,39 @@ function __d($arg, $exit=false)
 // Max action name 32 chars
 function filter_routes($get_action_names, $post_action_names)
 {
-	if( is_string($_GET['post_uri']) && strlen($_GET['post_uri']) < 32 && in_array($_GET['post_uri'], $post_action_names)){
+	if( is_string($_GET['post_uri']) && in_array($_GET['post_uri'], $post_action_names)){
 		return call_user_func( 'post_' . preg_replace("/[^a-zA-Z0-9]/", '_', $_GET['post_uri']));
 	}
 
-	if( is_string($_GET['uri']) && strlen($_GET['uri']) < 32 && in_array($_GET['uri'], $get_action_names)){
+	if( is_string($_GET['uri']) && in_array($_GET['uri'], $get_action_names)){
 		return call_user_func( 'get_' . preg_replace("/[^a-zA-Z0-9]/", '_', $_GET['uri']));
+	}
+
+	if( !$_GET['uri'] ){
+		return get_root();
 	}
 
 	return get_404();
 }
 
 
-// Permitted GET, POST, cookie params, with typecasting
+// Permitted GET, POST, cookie params, with strlen check and typecasting
+// Ex: $get_param_names = [ 'param_name' => int_length ... ]
 function filter_permitted_params($get_param_names, $post_param_names, $cookie_param_names, $get_typecasts, $post_typecasts)
 {
 	foreach ($_GET as $key => $value) {
-		if(!in_array($key, $get_param_names)) unset($_GET[$key]);
+		if(!array_key_exists($key, $get_param_names)) unset($_GET[$key]);
+		else if(strlen($_GET[$key]) > $get_param_names[$key]) get_404();
 	}
 
 	foreach ($_POST as $key => $value) {
-		if(!in_array($key, $post_param_names)) unset($_POST[$key]);
+		if(!array_key_exists($key, $post_param_names)) unset($_POST[$key]);
+		else if(strlen($_POST[$key]) > $post_param_names[$key]) get_404();
 	}
 
 	foreach ($_COOKIE as $key => $value) {
-		if(!in_array($key, $cookie_param_names)) unset($_COOKIE[$key]);
+		if(!array_key_exists($key, $cookie_param_names)) unset($_COOKIE[$key]);
+		else if(strlen($_COOKIE[$key]) > $cookie_param_names[$key]) get_404();
 	}
 
 	foreach ($get_typecasts as $name => $type) {
@@ -278,8 +284,3 @@ function filter_set_flash()
 		cookie_delete('flash');
 	}
 }
-
-
-
-
-

@@ -29,6 +29,7 @@
 		pre{ tab-size:4; font-size: 1.1em; line-height:175%; }
 		.sourcecode .function_label, .sourcecode .curlybrace, .sourcecode .parenthesis, .sourcecode .bracket{ color: #007700; }
 		.sourcecode .function_name, .sourcecode .function_args{ color: #0000BB; }
+		.markdown{ font-family: 'courier new', courier; }
 	</style>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
@@ -55,8 +56,10 @@
 				</ul>
 			</li>
 		</ul>
-		<h2><?php echo basename($_GET['file']); ?></h2>
-		<pre class='sourcecode'><?php echo sourcecode(htmlentities(file_get_contents('./' . $_GET['file']))); ?></pre>
+		<div id='content'>
+			<h2><?php echo basename($_GET['file']); ?></h2>
+			<pre class="sourcecode <?= strpos($_GET['file'], '.md') > 0 ? 'markdown' : ''; ?> "><?php echo sourcecode(htmlentities(file_get_contents('./' . $_GET['file']))); ?></pre>
+		</div>
 	</div>
 </body>
 
