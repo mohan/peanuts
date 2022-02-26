@@ -3,6 +3,10 @@
 // License: GPL
 
 
+// 
+// Templates
+// 
+
 function render($template_name, $args=[], $html_container='index.php')
 {
 	$template_path = './' . APP_NAME . '/templates/' . APP_TEMPLATE . '/';
@@ -32,31 +36,22 @@ function render_partial($template_name, $args=[], $return=false)
 }
 
 
+
+
+
+
+
+
+
+
+
+// 
+// URL helpers
+// 
+
 function urlto_template_asset($uri)
 {
 	return CONFIG_ROOT_URL . APP_NAME . '/templates/' . APP_TEMPLATE . '/assets/' . $uri;
-}
-
-
-function formto($uri, $args=[], $attrs=[])
-{
-	$url = urltopost($uri, $args);
-
-	$attrs_str = '';
-	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "'";
-
-	return "<form method='post' action='$url' $attrs_str>";
-}
-
-
-function linkto($uri, $html, $args=[], $attrs=[])
-{
-	$url = urltoget($uri, $args, '&amp;');
-	
-	$attrs_str = '';
-	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
-
-	return "<a href='$url' $attrs_str>" . htmlentities($html) . "</a>";
 }
 
 
@@ -85,6 +80,58 @@ function urltopost($uri, $args=[], $arg_separator='&')
 }
 
 
+function redirectto($uri, $args=[])
+{
+	header('Location: ' . urltoget($uri, $args));
+	exit;
+}
+
+
+function get_404()
+{
+	header("HTTP/1.1 404 Not Found");
+	render('404.php', ['__pagetitle'=>'404']);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+// HTML Tag helpers
+// 
+
+function formto($uri, $args=[], $attrs=[])
+{
+	$url = urltopost($uri, $args);
+
+	$attrs_str = '';
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "'";
+
+	return "<form method='post' action='$url' $attrs_str>";
+}
+
+
+function linkto($uri, $html, $args=[], $attrs=[])
+{
+	$url = urltoget($uri, $args, '&amp;');
+	
+	$attrs_str = '';
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
+
+	return "<a href='$url' $attrs_str>" . htmlentities($html) . "</a>";
+}
+
+
 // Auto htmlentities for safe user input
 function tag($html, $attrs=[], $name='div', $closing=true)
 {
@@ -106,19 +153,19 @@ function tag($html, $attrs=[], $name='div', $closing=true)
 }
 
 
-function tag_table($headers, $data, $attrs=[])
+function tag_table($headers, $data, $attrs=[], $escape_values=true)
 {
 	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
 
 	$out = "<table $attrs_str><thead>\n<tr>";
 	foreach ($headers as $key => $value) {
-		$out .= "<th>$value</th>";
+		$out .= '<th>' . ($escape_values ? htmlentities($value) : $value) . '</th>';
 	}
 	$out .= "</tr>\n</thead>\n<tbody>\n";
 	foreach ($data as $row_key => $row_value) {
 		$out .= "<tr>\n";
 		foreach ($row_value as $cell_key => $cell_value) {
-			$out .= "<td>$cell_value</td>\n";
+			$out .= '<td>' . ($escape_values ? htmlentities($cell_value) : $cell_value) . "</td>\n";
 		}
 		$out .= "</tr>\n";
 	}
@@ -127,6 +174,55 @@ function tag_table($headers, $data, $attrs=[])
 	return $out;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+// 
+// Markdown
+// 
+
+function render_markdown($text, $shortcodes=false)
+{
+	$text = strip_tags($text);
+	
+	// Todo: Optimize, use substr.
+	$lines = explode("\n", $text);
+	foreach ($lines as $i => $line) {
+		if(strlen(trim($line)) == 0) $line = "&nbsp;";
+		
+		// Shortcode
+		if($shortcodes && preg_match("/\[[a-z]+[^\]]*\][^(]/", $line)){
+			$out .= process_shortcodes($line);
+		} else {
+			$out .= "<p>\n$line\n</p>\n";
+		}
+	}
+
+	return $out;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+// Shortcodes
+// 
 
 // Process all shortcodes using respective functions and replace with return values.
 function process_shortcodes($text)
@@ -173,25 +269,6 @@ function process_shortcodes($text)
 }
 
 
-function render_markdown($text, $shortcodes=false)
-{
-	$text = strip_tags($text);
-	
-	// Todo: Optimize, use substr.
-	$lines = explode("\n", $text);
-	foreach ($lines as $i => $line) {
-		if(strlen(trim($line)) == 0) $line = "&nbsp;";
-		
-		// Shortcode
-		if($shortcodes && preg_match("/\[[a-z]+[^\]]*\][^(]/", $line)){
-			$out .= process_shortcodes($line);
-		} else {
-			$out .= "<p>\n$line\n</p>\n";
-		}
-	}
-
-	return $out;
-}
 
 
 
@@ -209,26 +286,14 @@ function render_markdown($text, $shortcodes=false)
 
 
 
-function redirectto($uri, $args=[])
-{
-	header('Location: ' . urltoget($uri, $args));
-	exit;
-}
-
-
-function get_404()
-{
-	header("HTTP/1.1 404 Not Found");
-	render('404.php', ['__pagetitle'=>'404']);
-}
 
 
 
 
 
-
-
-
+// 
+// Flash messages
+// 
 
 function flash_set($html, $in_current_request=false)
 {
@@ -243,6 +308,38 @@ function flash_clear()
 {
 	cookie_delete('flash');
 }
+
+
+function filter_set_flash()
+{
+	$flash = secure_cookie_get('flash');
+
+	if($flash){
+		$_REQUEST['flash'] = $flash;
+		cookie_delete('flash');
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+// Secure cookie - Cookie with added authenticity
+// 
 
 
 function secure_cookie_set($name, $value)
@@ -291,6 +388,11 @@ function cookie_delete($name)
 
 
 
+
+// 
+// Debug helper
+// 
+
 // Simple debug
 // Remember to remove all debugs
 function __d($exit, ...$args)
@@ -319,12 +421,13 @@ function __d($exit, ...$args)
 
 
 // 
-// HTTP Filters
+// Config file helpers
 //
 
 
 // Defines constants CONFIG_NAME from config ini file
-function filter_set_config($filepath){
+function filter_set_config($filepath)
+{
 	$config = parse_ini_file($filepath);
 
 	foreach ($config as $key => $value) {
@@ -333,16 +436,20 @@ function filter_set_config($filepath){
 }
 
 
-function filter_set_flash()
-{
-	$flash = secure_cookie_get('flash');
 
-	if($flash){
-		$_REQUEST['flash'] = $flash;
-		cookie_delete('flash');
-	}
-}
 
+
+
+
+
+
+
+
+
+
+// 
+// Router
+// 
 
 // Map action names to functions and call current name
 // Max action name 32 chars
@@ -363,6 +470,23 @@ function filter_routes($get_action_names, $post_action_names)
 	return get_404();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 
+// Permitted Params
+// 
 
 
 // Permitted GET, POST, cookie params, with strlen check and typecasting

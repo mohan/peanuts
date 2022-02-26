@@ -46,7 +46,7 @@ filter_permitted_params(
 		'post_id' => 'int',
 		'page' => 'int'
 	],
-	// post typecast
+	// POST typecast
 	[ ]
 );
 
