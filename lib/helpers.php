@@ -14,12 +14,21 @@ function render($template_name, $args=[], $html_container='index.php')
 }
 
 
-function render_partial($template_name, $args=[])
+function render_partial($template_name, $args=[], $return=false)
 {
 	$template_path = './' . APP_NAME . '/templates/' . APP_TEMPLATE . '/';
 	
 	extract($args, EXTR_SKIP);
+
+	if($return) ob_start();
+	
 	include $template_path . $template_name;
+	
+	if($return) {
+		$out = ob_get_contents();
+		ob_end_clean();
+		return $out;
+	}
 }
 
 
@@ -36,7 +45,7 @@ function formto($uri, $args=[], $attrs=[])
 	$attrs_str = '';
 	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "'";
 
-	echo "<form method='post' action='$url' $attrs_str>";
+	return "<form method='post' action='$url' $attrs_str>";
 }
 
 
@@ -47,15 +56,19 @@ function linkto($uri, $html, $args=[], $attrs=[])
 	$attrs_str = '';
 	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
 
-	echo "<a href='$url' $attrs_str>" . htmlentities($html) . "</a>";
+	return "<a href='$url' $attrs_str>" . htmlentities($html) . "</a>";
 }
 
 
 function urltoget($uri, $args=[], $arg_separator='&')
 {
-	$args['uri'] = $uri;
+	if(!$args) $args = [];
+
 	$hash = isset($args['__hash']) ? '#' . $args['__hash'] : '';
 	unset($args['__hash']);
+
+	$_args = ['uri' => $uri];
+	$args = array_merge($_args, $args);
 
 	return CONFIG_ROOT_URL . '?' . http_build_query($args, '', $arg_separator) . $hash;
 }
@@ -63,7 +76,11 @@ function urltoget($uri, $args=[], $arg_separator='&')
 
 function urltopost($uri, $args=[], $arg_separator='&')
 {
-	$args['post_uri'] = $uri;
+	if(!$args) $args = [];
+	
+	$_args = ['post_uri' => $uri];
+	$args = array_merge($_args, $args);
+
 	return CONFIG_ROOT_URL . '?' . http_build_query($args, '', $arg_separator);
 }
 
@@ -75,16 +92,110 @@ function tag($html, $attrs=[], $name='div', $closing=true)
 
 	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
 	
-	echo "<$name $attrs_str";
+	$out .= "<$name $attrs_str";
 
 	if($name != 'input'){
-		echo ">" . htmlentities($html);
-		if($closing) echo "</$name>";
+		$out .= ">" . htmlentities($html);
+		if($closing) $out .= "</$name>";
 	} else {
-		echo "value='" . htmlentities($html) . "'";
-		echo " />";
+		$out .= "value='" . htmlentities($html) . "'";
+		$out .= " />";
 	}
+
+	return $out;
 }
+
+
+function tag_table($headers, $data, $attrs=[])
+{
+	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
+
+	$out = "<table $attrs_str><thead>\n<tr>";
+	foreach ($headers as $key => $value) {
+		$out .= "<th>$value</th>";
+	}
+	$out .= "</tr>\n</thead>\n<tbody>\n";
+	foreach ($data as $row_key => $row_value) {
+		$out .= "<tr>\n";
+		foreach ($row_value as $cell_key => $cell_value) {
+			$out .= "<td>$cell_value</td>\n";
+		}
+		$out .= "</tr>\n";
+	}
+	$out .= "</tbody></table>";
+
+	return $out;
+}
+
+
+// Process all shortcodes using respective functions and replace with return values.
+function process_shortcodes($text)
+{
+	// start with [
+	// \[([a-z]+) = name
+	// ([^\]]*) = args_str
+	// [^\(] = Should not match markdown links
+	if(!preg_match_all("/\[([a-z]+)([^\]]*)\][^(]/", $text, $matches)) return $text;
+
+	$shortcodes_list = shortcodes_list();
+	$shortcodes_matches = [];
+	$shortcode_replacements = [];
+	foreach ($matches[0] as $key => $match) {
+		$full_shortcode = trim($matches[0][$key]);
+		$name = $matches[1][$key];
+		$args_str = $matches[2][$key];
+
+		if(!in_array($name, $shortcodes_list)) continue;
+		
+		$args = [];
+		if(strpos($args_str, '=') === false){
+			$args[0] = $args_str;
+		} else {
+			if(preg_match_all('/([a-z]+)="?([^"]+)"?/', $args_str, $args_matches)){
+				$arg_counts = $args_matches[1] ? array_count_values($args_matches[1]) : [];
+
+				foreach ($args_matches[0] as $arg_key => $arg_value) {
+					$key = $args_matches[1][$arg_key];
+					$value = $args_matches[2][$arg_key];
+					
+					if($arg_counts[$key] > 1) $args[$key][] = $value;
+					else $args[$key] = $value;
+				}
+			}
+		}
+
+		// Todo: Optimize, insert using substr.
+		$shortcodes_matches[] = '/' . preg_quote($full_shortcode) . '/';
+		$shortcode_replacements[] = call_user_func("shortcode_$name", $args);
+	}
+
+	return preg_replace($shortcodes_matches, $shortcode_replacements, $text, 1);
+}
+
+
+function render_markdown($text, $shortcodes=false)
+{
+	$text = strip_tags($text);
+	
+	// Todo: Optimize, use substr.
+	$lines = explode("\n", $text);
+	foreach ($lines as $i => $line) {
+		if(strlen(trim($line)) == 0) $line = "&nbsp;";
+		
+		// Shortcode
+		if($shortcodes && preg_match("/\[[a-z]+[^\]]*\][^(]/", $line)){
+			$out .= process_shortcodes($line);
+		} else {
+			$out .= "<p>\n$line\n</p>\n";
+		}
+	}
+
+	return $out;
+}
+
+
+
+
 
 
 
@@ -108,7 +219,7 @@ function redirectto($uri, $args=[])
 function get_404()
 {
 	header("HTTP/1.1 404 Not Found");
-	render('404.php');
+	render('404.php', ['__pagetitle'=>'404']);
 }
 
 
@@ -182,9 +293,14 @@ function cookie_delete($name)
 
 // Simple debug
 // Remember to remove all debugs
-function __d($arg, $exit=false)
+function __d($exit, ...$args)
 {
-	echo "<textarea class='input' style='height:300px;'>" . htmlentities(print_r($arg, true)) . "</textarea>";
+	echo "<pre style='width:94%;margin:1%;padding:2%;background:#fff;border:2px solid #aa0000;'>";
+	foreach($args as $arg) {
+		echo htmlentities(print_r($arg, true));
+		echo "<hr/>";
+	}
+	echo "</pre>";
 	if($exit) exit;
 }
 
@@ -204,7 +320,29 @@ function __d($arg, $exit=false)
 
 // 
 // HTTP Filters
-// 
+//
+
+
+// Defines constants CONFIG_NAME from config ini file
+function filter_set_config($filepath){
+	$config = parse_ini_file($filepath);
+
+	foreach ($config as $key => $value) {
+		define('CONFIG_' . $key, $value);
+	}
+}
+
+
+function filter_set_flash()
+{
+	$flash = secure_cookie_get('flash');
+
+	if($flash){
+		$_REQUEST['flash'] = $flash;
+		cookie_delete('flash');
+	}
+}
+
 
 // Map action names to functions and call current name
 // Max action name 32 chars
@@ -226,61 +364,44 @@ function filter_routes($get_action_names, $post_action_names)
 }
 
 
+
 // Permitted GET, POST, cookie params, with strlen check and typecasting
 // Ex: $get_param_names = [ 'param_name' => int_length ... ]
 function filter_permitted_params($get_param_names, $post_param_names, $cookie_param_names, $get_typecasts, $post_typecasts)
 {
-	foreach ($_GET as $key => $value) {
-		if(!array_key_exists($key, $get_param_names)) unset($_GET[$key]);
-		else if(strlen($_GET[$key]) > $get_param_names[$key]) get_404();
-	}
+	_filter_permitted_params_names($_GET, $get_param_names);
+	_filter_permitted_params_names($_POST, $post_param_names);
+	_filter_permitted_params_names($_COOKIE, $cookie_param_names);
 
-	foreach ($_POST as $key => $value) {
-		if(!array_key_exists($key, $post_param_names)) unset($_POST[$key]);
-		else if(strlen($_POST[$key]) > $post_param_names[$key]) get_404();
-	}
-
-	foreach ($_COOKIE as $key => $value) {
-		if(!array_key_exists($key, $cookie_param_names)) unset($_COOKIE[$key]);
-		else if(strlen($_COOKIE[$key]) > $cookie_param_names[$key]) get_404();
-	}
-
-	foreach ($get_typecasts as $name => $type) {
-		if(is_string($_GET[$name]))
-		switch ($type) {
-			case 'int': $_GET[$name] = intval($_GET[$name]); break;
-			case 'float': $_GET[$name] = floatval($_GET[$name]); break;
-			case 'bool': $_GET[$name] = boolval($_GET[$name]); break;
-		}
-	}
-
-	foreach ($post_typecasts as $name => $type) {
-		if(is_string($_POST[$name]))
-		switch ($type) {
-			case 'int': $_POST[$name] = intval($_POST[$name]); break;
-			case 'float': $_POST[$name] = floatval($_POST[$name]); break;
-			case 'bool': $_POST[$name] = boolval($_POST[$name]); break;
-		}
-	}
+	_filter_permitted_params_typecast($_GET, $get_typecasts);
+	_filter_permitted_params_typecast($_POST, $post_typecasts);
 }
 
 
-// Defines constants CONFIG_NAME from config ini file
-function filter_set_config($filepath){
-	$config = parse_ini_file($filepath);
-
-	foreach ($config as $key => $value) {
-		define('CONFIG_' . $key, $value);
-	}
-}
-
-
-function filter_set_flash()
+function _filter_permitted_params_names($input, $permitted_arr)
 {
-	$flash = secure_cookie_get('flash');
+	foreach ($input as $key => $value) {
+		if(!array_key_exists($key, $permitted_arr)) unset($input[$key]);
+		else if(isset($input[$key])){
+			if(is_int($permitted_arr[$key]) && strlen($input[$key]) > $permitted_arr[$key]) {
+				get_404();
+			}
+			else if(is_string($permitted_arr[$key]) && !preg_match($permitted_arr[$key], $input[$key])) {
+				get_404();
+			}
+		}
+	}
+}
 
-	if($flash){
-		$_REQUEST['flash'] = $flash;
-		cookie_delete('flash');
+
+function _filter_permitted_params_typecast($input, $typecast_def_arr)
+{
+	foreach ($typecast_def_arr as $name => $type) {
+		if(is_string($input[$name]))
+		switch ($type) {
+			case 'int': $input[$name] = intval($input[$name]); break;
+			case 'float': $input[$name] = floatval($input[$name]); break;
+			case 'bool': $input[$name] = boolval($input[$name]); break;
+		}
 	}
 }

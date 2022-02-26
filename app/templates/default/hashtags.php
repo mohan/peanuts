@@ -1,6 +1,6 @@
 <div id='hashtags'>
 	<?php if($hashtag): ?>
-		<?php tag("#$hashtag", [], 'h2'); ?>
+		<?= tag("#$hashtag", [], 'h2'); ?>
 		<div id='posts' class='border-bottom p-b'>
 			<?php
 				foreach($posts as $post){
@@ -18,7 +18,7 @@
 	<p class='text-muted'>Hashtags are tags added to your title. "This is an example post. #example."</p>
 
 	<?php foreach($hashtags as $hashtag): ?>
-		<?php linkto('hashtags', "#$hashtag", ['hashtag'=>$hashtag], ['class' => 'btn btn-light']) ?>
+		<?= linkto('hashtags', "#$hashtag", ['hashtag'=>$hashtag], ['class' => 'btn btn-light']) ?>
 	<?php endforeach; ?>
 
 </div>

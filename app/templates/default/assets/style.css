@@ -1,7 +1,7 @@
 body{
 	font-size: 1.1em;
 	background: #f6f6f6;
-	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+	font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	margin: 0;
 }
@@ -72,18 +72,24 @@ label, .label{
 	font-family: georgia, 'courier new', courier;
 }
 
-.markdown{
-	font-size: 1.03em;
-	font-family: 'courier new', courier;
-	tab-size: 4;
-	white-space: break-spaces;
-	line-height: 1.8em;
+
+.table{
+	margin-bottom: 20px;
+}
+
+.table thead th{
+	border-bottom: 1px solid #777;
+	padding: 10px;
+}
+.table tbody td{
+	border-bottom: 1px solid #ccc;
+	padding: 10px;
 }
 
 
 #flash{
 	width: 700px;
-	margin: 0 auto;
+	margin: 5px auto 10px auto;
 	background: #eee;
 	padding: 10px 15px;
 	border-radius: 3px;
@@ -119,6 +125,7 @@ label, .label{
 /* Helpers */
 .d-block{ display: block; }
 .text-center{ text-align: center; }
+.text-right{ text-align: right; }
 .medium{ font-size: 0.9em; }
 .small{ font-size: 0.8em; }
 .smaller{ font-size: 0.6em; }
@@ -188,10 +195,7 @@ label, .label{
 /* Main */
 #main{
 	margin: 20px;
-}
-#main #flash{
-	max-width: 80%;
-	margin: 0 auto;
+	min-height: 75vh;
 }
 /* END Main */
 
@@ -243,45 +247,49 @@ label, .label{
 #quickpost-editor{
 	line-height: 1.6em;
 }
-#posts .post{
+/* END Posts */
+
+
+/* Post panel */
+.post-panel{
 	background: #fff;
 	padding: 10px;
 	margin-bottom: 6px;
 	border-bottom: 1px solid #ddd;
 	border-radius: 5px;
 }
-#posts .post h3{
+.post-panel h3{
 	margin: 0;
 }
-#posts .post h3 pre{
+.post-panel h3 pre{
 	font-size: 0.88em;
 	font-weight: normal;
 	font-family: georgia, 'courier new', courier;
 }
-#posts .post h3 a{
+.post-panel h3 a{
 	text-decoration: none;
 	color: #000;
 }
-#posts .post h3 a:hover{
+.post-panel h3 a:hover{
 	color: #0000EE;
 }
-#posts .user-container{
+.post-panel .user-container{
 	float: left;
 	width: 90px;
 	padding-left: 10px;
 }
-#posts .header-container{
+.post-panel .header-container{
 	padding-left: 115px;
 }
-#posts .header-container h3{
+.post-panel .header-container h3{
 	padding-top: 5px;
 }
-/* END Posts */
+/* END post panel */
 
 
 
 /* Post */
-body.post{
+body.post-with-body{
 	background: #fefefe;
 }
 #post{
@@ -291,7 +299,7 @@ body.post{
 #post .user-icon{
 	margin-bottom: 0;
 }
-#post .title pre{
+#post .title, #post .title pre{
 	letter-spacing: 1px;
 	font-family: georgia, 'courier new', courier;
 }
@@ -303,6 +311,12 @@ body.post{
 
 
 /* Comments */
+body.post .comment{
+	background: #fefefe;
+}
+body.post-with-body .comment{
+	background: #fefefe;
+}
 .comment{
 	padding: 10px;
 	margin-bottom: 10px;
@@ -328,3 +342,41 @@ body.post{
 	max-width: 1000px;
 }
 /* End Hashtags */
+
+
+/* Markdown */
+.markdown{
+	font-size: 1.03em;
+	font-family: 'courier new', courier;
+	line-height: 1.8em;
+}
+.markdown p{
+	margin: 0;
+}
+/* End Markdown */
+
+
+
+/* Shortcodes */
+.shortcode-post .post-panel{
+	border: 1px solid #ccc;
+	width: 80%;
+	margin-left: 20px;
+	font-family: sans-serif;
+}
+
+.shortcode-calendar tbody td{
+	padding: 20px;
+}
+
+.shortcode-calendar .marked{
+	padding: 10px;
+}
+
+.shortcode-calendar .marked{
+	background: #ddd;
+	display: block;
+	padding: 10px;
+	border-radius: 7px;
+}
+/* End Shortcode */

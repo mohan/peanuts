@@ -23,6 +23,10 @@ function data_table_posts()
 		'auto_timestamps' => true,		// 20
 	];
 
+	// meta
+	// comments, stars, views
+	// { c: 10, s: 10, v: 10 }
+
 	return $t;
 }
 
@@ -88,7 +92,7 @@ function _comments_table_validations($id, $values)
 function data_post_list($page, $per_page)
 {
 	$t = data_table_posts();
-	return csvdb_list($t, ['id', 'username', 'title', 'meta'], true, $page, $per_page);
+	return csvdb_list($t, ['id', 'username', 'title', 'meta', 'updated_at'], true, $page, $per_page);
 }
 
 
@@ -113,7 +117,7 @@ function data_post_pages_max($per_page)
 function data_post_hashtags($hashtag)
 {
 	$t = data_table_posts();
-	$posts = csvdb_list($t, ['id', 'username', 'title', 'meta']);
+	$posts = csvdb_list($t, ['id', 'username', 'title', 'meta', 'updated_at']);
 
 	$hashtags = [];
 	foreach ($posts as $key => $post) {
@@ -208,11 +212,18 @@ function data_comment_read($post_id, $id, $columns=[])
 
 function data_comment_create($username, $post_id, $body)
 {
+	$tp = data_table_posts();
 	$t = data_table_comments($post_id);
 	$values = [
 		'username' => $username,
 		'body' => csvdb_text_create($t, 'body', $body)
 	];
+
+	if($values['body']){
+		$post = csvdb_read($tp, $post_id, ['meta']);
+		$post['meta']['c'] = $post['meta']['c'] + 1;
+		csvdb_update($tp, $post_id, ['meta'=>$post['meta']]);
+	}
 
 	return csvdb_create($t, $values);
 }

@@ -37,7 +37,7 @@ function filter_set_username()
 
 function get_login()
 {
-	render('login.php');
+	render('login.php', ['__pagetitle'=>'Login']);
 }
 
 
@@ -88,7 +88,7 @@ function get_posts()
 	$per_page = 30;
 	$posts = data_post_list($page, $per_page);
 
-	render('posts.php', ['posts'=>$posts, 'page'=>$page, 'per_page' => $per_page]);
+	render('posts.php', ['__pagetitle'=>'Posts', 'posts'=>$posts, 'page'=>$page, 'per_page' => $per_page]);
 }
 
 
@@ -101,13 +101,13 @@ function get_post()
 
 	$comments = data_comment_list($id);
 
-	render('post.php', ['id'=>$id, 'post'=>$post, 'comments'=>$comments]);
+	render('post.php', ['__pagetitle'=>substr($post['title'], 0, 20), 'id'=>$id, 'post'=>$post, 'comments'=>$comments]);
 }
 
 
 function get_new_post()
 {
-	render('post-editor.php');
+	render('post-editor.php', ['__pagetitle'=>'New Post']);
 }
 
 
@@ -120,6 +120,7 @@ function get_edit_post()
 	$post = data_post_read($id);
 	if(!$post) return get_404();
 
+	$post['__pagetitle'] = "Edit Post #$id";
 	render('post-editor.php', $post);
 }
 
@@ -133,6 +134,7 @@ function get_edit_comment()
 	$comment = data_comment_read($post_id, $id);
 	if(!$comment) return get_404();
 
+	$comment['__pagetitle'] = "Edit Comment #$id";
 	render('comment-editor.php', $comment);
 }
 
@@ -141,9 +143,28 @@ function get_hashtags()
 {
 	extract($_GET);
 
-	render('hashtags.php', data_post_hashtags($hashtag));
+	$data = data_post_hashtags($hashtag);
+
+	$data['__pagetitle'] = ($hashtag ? "#$hashtag - " : '') . 'Hashtags';
+	render('hashtags.php', $data);
 }
 
+
+function get_page()
+{
+	extract($_GET);
+
+	if(!in_array($slug, ['readme', 'markdown', 'shortcodes'])) return get_404();
+
+	if($slug == 'readme'){
+		$text = file_get_contents("./readme.md");
+	} else {
+		$pages_path = './' . APP_NAME . '/pages';
+		$text = file_get_contents("$pages_path/$slug.md");
+	}
+
+	render('page.php', ['__pagetitle' => ucfirst($slug), 'text'=>$text]);
+}
 
 
 

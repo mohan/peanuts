@@ -1,18 +1,20 @@
 <div id='posts'>
 
-	<div class='border-bottom m-b'>
+	<div class='post-panel border-bottom m-b'>
 		<div class='user-container'>
-			<?php tag(user_initial($_REQUEST['username']), ['class'=>'user-icon', 'style'=>'margin-top:30px;'], 'h4'); ?>
+			<?= tag(user_initial($_REQUEST['username']), ['class'=>'user-icon', 'style'=>'margin-top:30px;'], 'h4'); ?>
 		</div>
 		<?= formto('create-quick-post', NULL, ['class'=>'header-container']); ?>
 			<label for='quickpost-editor' class='d-block text-muted small'>
-				QuickPost (<?php linkto('hashtags', 'Hashtags', [], ['class'=>'text-muted']); ?>)
+				QuickPost (<?= linkto('hashtags', 'Hashtags', [], ['class'=>'text-muted']); ?>)
 			</label>
-			<?php tag($_POST['title'], ['name'=> 'title', 'id'=>'quickpost-editor', 'class'=>'input', 'style'=>'height:100px;'], 'textarea'); ?>
+			<?= tag($_POST['title'], ['name'=> 'title', 'id'=>'quickpost-editor', 'class'=>'input', 'style'=>'height:100px;'], 'textarea'); ?>
 			<div id='quickpost-strlen' class='small text-muted'></div>
 			<input type='submit' value='Post' class='btn btn-primary' />
 		</form>
 	</div>
+
+	<?= tag($_REQUEST['flash'], ['id'=>'flash', 'class'=>'text-center']); ?>
 
 	<?php
 		foreach($posts as $post){
