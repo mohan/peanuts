@@ -4,7 +4,7 @@
 	</div>
 	<div class='header-container'>
 		<h3>
-			<a href='<?= urltoget('post', [id=>$post['id']]); ?>' class='d-block'>
+			<a href='<?= urltoget('post', [post_id=>$post['id']]); ?>' class='d-block'>
 				<?= tag($post['title'], ['class'=>'markdown'], 'pre') ?>
 			</a>
 		</h3>

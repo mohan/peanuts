@@ -25,7 +25,7 @@
 			<div class='user-container'>
 				<?= tag(user_initial($_REQUEST['username']), ['class'=>'user-icon', 'style'=>'margin-top:30px;'], 'h4'); ?>
 			</div>
-			<?= formto('create-comment', ['id' => $id], ['class'=>'header-container']); ?>
+			<?= formto('create-comment', ['post_id' => $post['id']], ['class'=>'header-container']); ?>
 				<label for='comment-body-editor' class='d-block text-muted small'>
 					Add Comment
 					(<?= linkto('page', 'Markdown', ['slug'=>'markdown'], ['class'=>'text-muted small', 'target'=>'app-page']); ?>)
@@ -35,7 +35,7 @@
 			</form>
 		</div>
 		<?php foreach($comments as $comment): ?>
-			<?php render_partial('_comment.php', ['comment'=>$comment, 'post_id'=>$id]); ?>
+			<?php render_partial('_comment.php', ['comment'=>$comment, 'post_id'=>$post['id']]); ?>
 		<?php endforeach; ?>
 	</div>
 </div>
