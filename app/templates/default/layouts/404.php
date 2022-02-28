@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title>404 - <?= CONFIG_APP_TITLE ?></title>
+	<link rel="stylesheet" type="text/css" href="<?= urlto_template_asset('style.css'); ?>" />
+</head>
+<body>
+	<div class='panel' style='margin-top:30px;'>
+		<?= html_app_title(); ?>
+		<div class='body'>
+			Page not found!
+
+			<?= tag($message, [], 'p') ?>
+		</div>
+	</div>
+</body>
+</html>

@@ -12,7 +12,7 @@ function shortcode_post($args)
 	
 	$post = data_post_read($id, ['id', 'username', 'title', 'meta', 'updated_at']);
 
-	return "<div class='shortcode-post'>" . render_partial('_post.php', ['post'=>$post], true) . "</div>";
+	return "<div class='shortcode-post'>" . render_partial('posts/_post.php', ['post'=>$post], true) . "</div>";
 }
 
 

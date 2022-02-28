@@ -4,7 +4,7 @@
 		<div id='posts' class='border-bottom p-b'>
 			<?php
 				foreach($posts as $post){
-					render_partial('_post.php', ['post'=>$post]);
+					render_partial('posts/_post.php', ['post'=>$post]);
 				}
 			?>
 

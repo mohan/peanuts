@@ -1,13 +1,13 @@
 <div id='new-post'>
-	<?= tag($_REQUEST['flash'], ['id'=>'flash', 'class'=>'text-center']); ?>
+	<?= html_flash(); ?>
 	<h2>
 		<?php if($post): ?>
-			Edit Post <?= linkto('post', '#'.$post['id'], ['post_id'=>$post['id']]); ?>
+			Edit Post <?= link_getpost('#'.$post['id'], $post); ?>
 		<?php else: ?>
 			New Post
 		<?php endif; ?>
 	</h2>
-	<?= $post ? formto('update-post', ['post_id'=>$post['id']]) : formto('create-post'); ?>
+	<?= $post ? formto('post', ['post_id'=>$post['id'], '__method'=>'patch']) : formto('post'); ?>
 		<label class='d-block' for='post-title-editor' autocomplete='false'>Title</label>
 		<?= tag($post['title'], ['name'=> 'title', 'class'=>'editor', 'id'=>'post-title-editor'], 'textarea'); ?>
 		<label class='d-block' for='post-body-editor'>

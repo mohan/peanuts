@@ -1,7 +1,7 @@
 body{
-	font-size: 1.1em;
+	font-size: 1.07em;
 	background: #f6f6f6;
-	font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+	font-family: "Helvetica Neue", Arial, sans-serif;
 	line-height: 1.5;
 	margin: 0;
 }
@@ -19,7 +19,7 @@ label, .label{
 	margin-top: 10px;
 }
 
-.input{
+input[type='text'], input[type='password'], textarea, .input{
 	font-size: 1em;
 	width: 100%;
 	border-radius: 2px;
@@ -53,25 +53,6 @@ label, .label{
 	color: #fff;
 }
 
-.editor{
-	display: block;
-	width: 100%;
-	border: 1px solid #ccc;
-	outline: none;
-	font-size: 1em;
-	font-family: 'courier new', courier;
-	line-height: 1.8em;
-	padding: 20px;
-	tab-size: 4;
-}
-
-#post-title-editor{
-	height: 20px;
-	padding: 10px 20px;
-	letter-spacing: 1px;
-	font-family: georgia, 'courier new', courier;
-}
-
 
 .table{
 	margin-bottom: 20px;
@@ -86,6 +67,46 @@ label, .label{
 	padding: 10px;
 }
 
+/* Markdown */
+.markdown{
+	font-size: 1.03em;
+	font-family: 'courier new', courier;
+	line-height: 1.8em;
+}
+.markdown p{
+	margin: 0;
+}
+/* End Markdown */
+
+
+/* Helpers */
+.d-block{ display: block; }
+.text-center{ text-align: center; }
+.text-right{ text-align: right; }
+.medium{ font-size: 0.9em; }
+.small{ font-size: 0.8em; }
+.smaller{ font-size: 0.6em; }
+.clear:after{
+	clear: both;
+	content: " ";
+	display: block;
+}
+.text-dark{ color: #333; }
+.text-muted{ color: #777; }
+.border-bottom{ border-bottom: 1px solid #eaeaea; }
+.p-b{ padding-bottom: 20px; }
+.p-t{ padding-top: 20px; }
+.m-b{ margin-bottom: 20px; }
+.m-t{ margin-top: 20px; }
+/* END Helpers */
+
+
+#main{
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	min-height: 75vh;
+}
 
 #flash{
 	width: 700px;
@@ -94,6 +115,7 @@ label, .label{
 	padding: 10px 15px;
 	border-radius: 3px;
 	font-size: 0.9em;
+	text-align: center;
 }
 
 
@@ -121,40 +143,6 @@ label, .label{
 }
 /* END Panel */
 
-
-/* Helpers */
-.d-block{ display: block; }
-.text-center{ text-align: center; }
-.text-right{ text-align: right; }
-.medium{ font-size: 0.9em; }
-.small{ font-size: 0.8em; }
-.smaller{ font-size: 0.6em; }
-.clear:after{
-	clear: both;
-	content: " ";
-	display: block;
-}
-.text-dark{ color: #333; }
-.text-muted{ color: #777; }
-.border-bottom{ border-bottom: 1px solid #eaeaea; }
-.p-b{ padding-bottom: 20px; }
-.m-b{ margin-bottom: 20px; }
-/* END Helpers */
-
-
-
-/* Login page */
-#login {
-	margin-top: 2%;
-}
-#login input, #login .input{
-	font-size: 1em;
-	width: 100%;
-	border-radius: 2px;
-	border: 1px solid #ccc;
-	padding: 5px;
-}
-/* END Login page */
 
 
 /* Navbar */
@@ -192,14 +180,6 @@ label, .label{
 /* END Navbar */
 
 
-/* Main */
-#main{
-	margin: 20px;
-	min-height: 75vh;
-}
-/* END Main */
-
-
 /* User */
 .user-icon{
 	color: #fff;
@@ -217,38 +197,6 @@ label, .label{
 /* END User */
 
 
-/* New post */
-#new-post{
-	margin: 0 auto;
-	max-width: 1000px;
-}
-#new-post h2{
-	color: #666;
-	font-size: 1.2em;
-}
-#post-body-editor{
-	height: 500px;
-}
-#new-post label, #new-post label a{
-	color: #888;
-	font-size: 0.8em;
-}
-#new-post label a{
-	text-decoration: underline;
-}
-/* END New post */
-
-
-/* Posts */
-#posts{
-	margin: 50px auto;
-	max-width: 1000px;
-}
-#quickpost-editor{
-	line-height: 1.6em;
-}
-/* END Posts */
-
 
 /* Post panel */
 .post-panel{
@@ -261,7 +209,7 @@ label, .label{
 .post-panel h3{
 	margin: 0;
 }
-.post-panel h3 pre{
+.post-panel h3 .markdown{
 	font-size: 0.88em;
 	font-weight: normal;
 	font-family: georgia, 'courier new', courier;
@@ -310,6 +258,33 @@ body.post-with-body{
 /* END Post */
 
 
+/* editor */
+.editor{
+   display: block;
+   width: 100%;
+   border: 1px solid #ccc;
+   outline: none;
+   font-size: 1em;
+   font-family: 'courier new', courier;
+   line-height: 1.8em;
+   padding: 20px;
+   tab-size: 4;
+}
+
+#post-title-editor{
+   height: 20px;
+   padding: 10px 20px;
+   letter-spacing: 1px;
+   font-family: georgia, 'courier new', courier;
+}
+
+#post-body-editor{
+	height: 70vh;
+}
+
+/* END editor */
+
+
 /* Comments */
 body.post .comment{
 	background: #fefefe;
@@ -336,32 +311,11 @@ body.post-with-body .comment{
 
 
 
-/* Hashtags */
-#hashtags{
-	margin: 0 auto;
-	max-width: 1000px;
-}
-/* End Hashtags */
-
-
-/* Markdown */
-.markdown{
-	font-size: 1.03em;
-	font-family: 'courier new', courier;
-	line-height: 1.8em;
-}
-.markdown p{
-	margin: 0;
-}
-/* End Markdown */
-
-
-
 /* Shortcodes */
 .shortcode-post .post-panel{
 	border: 1px solid #ccc;
 	width: 80%;
-	margin-left: 20px;
+	margin-left: 15px;
 	font-family: sans-serif;
 }
 

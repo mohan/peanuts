@@ -71,20 +71,20 @@ Work in progress: true
 
 ## Recipe
 
-### SweetPeanutMild++ v0.0.2
+### SweetPeanut++ v0.0.3
 
 Ingredients:
 * ~128 raw peanuts
-* 1.5  spoons vegetable oil
-* 1.5  spoons sugar
-* 1.5  spoons flour
+* 1.0  spoons vegetable oil
+* 1.7  spoons sugar
+* 1.0  spoons flour
 * ~16  spoons water
 
 Process:
 1. Roast peanuts in vegetable oil.
 2. Mix water, sugar and flour.
-3. Add syrup to roasted peanuts and stir until caramel is coated well.
-4. Enjoy SweetPeanutMild++ with your team.
+3. Add syrup to roasted peanuts and stir a little until caramel is coated well.
+4. Enjoy SweetPeanut++ with your team.
 
 
 

@@ -130,6 +130,8 @@ function data_post_hashtags($hashtag)
 		}
 	}
 
+	$hashtags = array_unique($hashtags);
+
 	if($hashtag){
 		return ['hashtags' => $hashtags, 'hashtag' => $hashtag, 'posts' => $posts];
 	} else {
@@ -242,3 +244,8 @@ function data_comment_update($post_id, $id, $body)
 	return csvdb_update($t, $id, $values);
 }
 
+function data_comment_pages_max($post_id, $per_page)
+{
+	$t = data_table_comments($post_id);
+	return csvdb_last_id($t) / $per_page;
+}
