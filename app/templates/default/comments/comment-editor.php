@@ -6,4 +6,8 @@
 		<?= tag($comment['body'], ['id'=>'comment-body-editor', 'name'=>'body', 'class'=>'editor', 'style'=>'height:100px'], 'textarea'); ?>
 		<input type='submit' value='Submit' class='btn btn-primary' />
 	</form>
+
+	<?= formto('comment-to-trash', ['post_id'=>$post_id, 'comment_id'=>$comment['id'], '__method'=>'delete'], ['data-alert'=>'Move comment to trash? It can be restored.']) ?>
+		<input type='submit' value='Move to trash' class='btn btn-danger' />
+	</form>
 </div>

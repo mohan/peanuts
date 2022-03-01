@@ -43,6 +43,11 @@ input[type='text'], input[type='password'], textarea, .input{
 	color: #fff;
 }
 
+.btn.btn-danger{
+	background: #AA0000;
+	color: #fff;
+}
+
 .btn.btn-light{
 	background: #e0e0e0;
 	color: #000;

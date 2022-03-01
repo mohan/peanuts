@@ -13,11 +13,11 @@ function filter_set_username()
 		$_GET['post_uri'] == 'login'
 	) return true;
 
-	$username = secure_cookie_get('auth_username');
+	$username = secure_cookie_get('auth');
 
 	if($username){
 		// Update cookie authenticity
-		secure_cookie_set('auth_username', $username);
+		secure_cookie_set('auth', $username);
 
 		// Set request username
 		$_REQUEST['username'] = $username;
@@ -49,7 +49,7 @@ function post_login()
 	extract($_POST);
 
 	if(array_key_exists($post_username, CONFIG_USERS) && md5($post_team_password) == CONFIG_TEAM_PASSWORD){
-		secure_cookie_set('auth_username', $post_username);
+		secure_cookie_set('auth', $post_username);
 		return redirectto('posts');
 	} else {
 		return redirectto('login');
@@ -59,7 +59,7 @@ function post_login()
 
 function post_logout()
 {
-	cookie_delete('auth_username');
+	cookie_delete('auth');
 	return redirectto('login');
 }
 
@@ -125,7 +125,7 @@ function get_new_post()
 
 function get_edit_post()
 {
-	if(!_can_current_user_can_edit_post()) return get_404('No post found.');
+	if(!_can_current_user_edit_post()) return get_404('No post found.');
 
 	extract($_GET);
 
@@ -138,7 +138,7 @@ function get_edit_post()
 
 function get_edit_comment()
 {
-	if(!_can_current_user_can_edit_comment()) return get_404('No comment found.');
+	if(!_can_current_user_edit_comment()) return get_404('No comment found.');
 
 	extract($_GET);
 
@@ -248,7 +248,7 @@ function post_comment()
 
 function patch_post()
 {
-	if(!_can_current_user_can_edit_post()) return get_404('Post not found.');
+	if(!_can_current_user_edit_post()) return get_404('Post not found.');
 
 	extract($_REQUEST);
 
@@ -264,7 +264,7 @@ function patch_post()
 
 function patch_comment()
 {
-	if(!_can_current_user_can_edit_comment()) return get_404('Comment not found.');
+	if(!_can_current_user_edit_comment()) return get_404('Comment not found.');
 
 	extract($_REQUEST);
 
@@ -279,13 +279,44 @@ function patch_comment()
 
 
 
+// 
+// Delete requests
+// 
+
+function delete_post_to_trash()
+{
+	if(!_can_current_user_edit_post()) return get_404('Post not found.');
+
+	extract($_GET);
+
+	flash_set(
+		data_trash_post($post_id) ? "Post #$post_id moved to trash!" : "An error occurred!"
+	);
+
+	return redirectto('posts');
+}
+
+
+function delete_comment_to_trash()
+{
+	if(!_can_current_user_edit_comment()) return get_404('Comment not found.');
+
+	extract($_GET);
+
+	flash_set(
+		data_trash_comment($post_id, $comment_id) ? "Post #$post_id - comment #$comment_id moved to trash!" : "An error occurred!"
+	);
+
+	return redirectto('post', ['post_id'=>$post_id]);
+}
+
 
 
 // 
 // Internal
 // 
 
-function _can_current_user_can_edit_post()
+function _can_current_user_edit_post()
 {
 	extract($_REQUEST);
 
@@ -294,7 +325,7 @@ function _can_current_user_can_edit_post()
 }
 
 
-function _can_current_user_can_edit_comment()
+function _can_current_user_edit_comment()
 {
 	extract($_REQUEST);
 	

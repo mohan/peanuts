@@ -6,13 +6,6 @@ define('ROOT_DIR', __DIR__ . '/../');
 require ROOT_DIR . '/lib/test-helpers.php';
 require ROOT_DIR . '/index.php';
 
-define(LOGIN_URL, urltoget('login'));
-$test_post_data = ['title'=>'test-post-1234 #zxcv', 'body' => 'test-post-body-1234'];
-$test_post_id = 0;
-$test_comment_data = ['body' => 'test-comment-body-1234'];
-$test_comment_id = 0;
-
-
 call_tests([
 	'get_login',
 	'post_login',
@@ -34,8 +27,8 @@ call_tests([
 	'patch_post',
 	'patch_comment',
 
-	// 'delete_post',
-	// 'delete_comment'
+	'trash_post',
+	'trash_comment'
 ]);
 
 
@@ -48,7 +41,7 @@ function test_get_login()
 					strpos($response['body'], "<title>Login") !== false
 	);
 
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = do_get($url, ['auth'=>_auth()]);
 	t("Login page renders with existing auth?", sizeof($response['headers']) == 0 &&
 					strpos($response['body'], "<title>Login") !== false
 	);
@@ -76,11 +69,7 @@ function test_post_logout()
 
 function test_get_root()
 {
-	$url = '';
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = _test_get_user_page($url);
 	t("gets posts", is_redirect(urltoget('posts'), $response));
 }
 
@@ -88,10 +77,7 @@ function test_get_root()
 function test_get_new_post()
 {
 	$url = urltoget('new-post');
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = _test_get_user_page($url);
 	t("gets new post form", _is_user_page($response, formto('post')));
 }
 
@@ -99,64 +85,50 @@ function test_get_new_post()
 function test_get_posts()
 {
 	$url = urltoget('posts');
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = _test_get_user_page($url);
 	t("gets posts", _is_user_page($response, formto('quick-post')));
 }
 
 
 function test_get_post()
 {
-	global $test_post_data;
-	global $test_post_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
 
-	$url = urltoget('post', ['post_id'=>$test_post_id]);
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
-	t("gets post post_id $test_post_id", _is_user_page($response, html_markdown($test_post_data['body'])));
+	$url = urltoget('post', ['post_id'=>$p_id]);
+	$response = _test_get_user_page($url);
+	t("gets post post_id $p_id", _is_user_page($response, html_markdown($p_body)));
 }
 
 
 function test_get_edit_post()
 {
-	global $test_post_data;
-	global $test_post_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
 
-	$url = urltoget('edit-post', ['post_id'=>$test_post_id]);
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
-	t("edit page for post_id $test_post_id", _is_user_page($response, $test_post_data['body']));
+	$url = urltoget('edit-post', ['post_id'=>$p_id]);
+	$response = _test_get_user_page($url);
+	t("edit page for post_id $p_id", _is_user_page($response, $p_body));
 }
 
 
 function test_get_edit_comment()
 {
-	global $test_comment_data;
-	global $test_post_id;
-	global $test_comment_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
+	$comment = _create_new_comment($p_id);
+	extract($comment, EXTR_PREFIX_ALL, 'c');
 
-	$url = urltoget('edit-comment', ['post_id'=>$test_post_id, 'comment_id'=>$test_comment_id]);
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
-	t("edit page for comment_id $test_comment_id", _is_user_page($response, $test_comment_data['body']));
+	$url = urltoget('edit-comment', ['post_id'=>$p_id, 'comment_id'=>$c_id]);
+	$response = _test_get_user_page($url);
+	t("edit page for comment_id $c_id", _is_user_page($response, $c_body));
 }
 
 
 function test_get_hashtags()
 {
 	$url = urltoget('hashtags');
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = _test_get_user_page($url);
 	t("Hashtags", _is_user_page($response, '#zxcv'));
 }
 
@@ -164,10 +136,7 @@ function test_get_hashtags()
 function test_get_page()
 {
 	$url = urltoget('page', ['slug'=>'readme']);
-	$response = do_get($url);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_get($url, ['auth_username'=>_auth_username()]);
+	$response = _test_get_user_page($url);
 	t("Page", _is_user_page($response, 'License: GPL (Free as in free peanuts.)'));
 }
 
@@ -179,33 +148,21 @@ function test_get_page()
 
 function test_post_quick_post()
 {
-	global $test_post_data;
-	global $test_post_id;
-
 	$url = urltopost('quick-post');
-	$response = do_post($url, $test_post_data);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_post($url, $test_post_data, ['auth_username'=>_auth_username()]);
-	$test_post_id = data_post_pages_max(1);
-	t("creates a quick post $test_post_id", is_redirect( urltoget('posts'), $response));
+	$response = _test_post_user_page($url, ['title'=>'This is a quick post']);
+	$post_id = data_post_pages_max(1);
+	t("creates a quick post $post_id", is_redirect( urltoget('posts'), $response));
 }
 
 
 function test_post_post()
 {
-	global $test_post_data;
-	global $test_post_id;
-
 	$url = urltopost('post');
-	$response = do_post($url, $test_post_data);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_post($url, $test_post_data, ['auth_username'=>_auth_username()]);
-	$test_post_id = data_post_pages_max(1);
-	t("creates a new post $test_post_id", 
+	$response = _test_post_user_page($url, ['title'=>'Test post title', 'body'=>'Post body']);
+	$post_id = data_post_pages_max(1);
+	t("creates a new post $post_id", 
 		is_redirect(
-			urltoget('post', ['post_id' => $test_post_id]),
+			urltoget('post', ['post_id' => $post_id]),
 			$response
 		)
 	);
@@ -214,17 +171,14 @@ function test_post_post()
 
 function test_patch_post()
 {
-	global $test_post_data;
-	global $test_post_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
 
-	$url = urltopost('post', ['__method'=>'patch', 'post_id' => $test_post_id]);
-	$response = do_post($url, $test_post_data);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_post($url, $test_post_data, ['auth_username'=>_auth_username()]);
-	t("Patches a post $test_post_id", 
+	$url = urltopost('post', ['__method'=>'patch', 'post_id' => $p_id]);
+	$response = _test_post_user_page($url, ['title' => 'Patched title', 'body' => 'patched text.']);
+	t("Patches a post $p_id", 
 		is_redirect(
-			urltoget('post', ['post_id' => $test_post_id]),
+			urltoget('post', ['post_id' => $p_id]),
 			$response
 		)
 	);
@@ -233,19 +187,15 @@ function test_patch_post()
 
 function test_post_comment()
 {
-	global $test_comment_data;
-	global $test_post_id;
-	global $test_comment_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
 
-	$url = urltopost('comment', ['post_id'=>$test_post_id]);
-	$response = do_post($url, $test_comment_data);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_post($url, $test_comment_data, ['auth_username'=>_auth_username()]);
-	$test_comment_id = data_comment_pages_max($test_post_id, 1);
-	t("creates a new comment $test_comment_id", 
+	$url = urltopost('comment', ['post_id'=>$p_id]);
+	$response = _test_post_user_page($url, ['body'=>'Test comment body']);
+	$comment_id = data_comment_pages_max($p_id, 1);
+	t("creates a new comment $comment_id", 
 		is_redirect(
-			urltoget('post', ['post_id' => $test_post_id, '__hash' => 'comments']),
+			urltoget('post', ['post_id' => $p_id, '__hash' => 'comments']),
 			$response
 		)
 	);
@@ -254,26 +204,55 @@ function test_post_comment()
 
 function test_patch_comment()
 {
-	global $test_comment_data;
-	global $test_post_id;
-	global $test_comment_id;
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
+	$comment = _create_new_comment($p_id);
+	extract($comment, EXTR_PREFIX_ALL, 'c');
 
-	$url = urltopost('comment', ['__method'=>'patch', 'post_id'=>$test_post_id, 'comment_id'=>$test_comment_id]);
-	$response = do_post($url, $test_comment_data);
-	t("redirects if not logged-in", is_redirect(LOGIN_URL, $response));
-
-	$response = do_post($url, $test_comment_data, ['auth_username'=>_auth_username()]);
-	t("patches comment $test_comment_id post $test_post_id", is_redirect( urltoget('post', ['post_id' => $test_post_id]), $response ) );
+	$url = urltopost('comment', ['__method'=>'patch', 'post_id'=>$p_id, 'comment_id'=>$c_id]);
+	$response = _test_post_user_page($url, ['body' => 'patched text...']);
+	t("patches comment $c_id post $p_id", is_redirect( urltoget('post', ['post_id' => $p_id]), $response ) );
 }
+
+
+// Delete request
+function test_trash_post()
+{
+	$post = _create_new_post();
+	extract($post);
+
+	$url = urltopost('post-to-trash', ['__method'=>'delete', 'post_id'=>$id]);
+	$response = _test_post_user_page($url, []);
+	t("Trash post $id", is_redirect( urltoget('posts'), $response ) && is_flash("Post #$id moved to trash!", $response) );
+}
+
+
+function test_trash_comment()
+{
+	$post = _create_new_post();
+	extract($post, EXTR_PREFIX_ALL, 'p');
+	$comment = _create_new_comment($p_id);
+	extract($comment, EXTR_PREFIX_ALL, 'c');
+
+	$url = urltopost('comment-to-trash', ['__method'=>'delete', 'post_id'=>$p_id, 'comment_id'=>$c_id]);
+	$response = _test_post_user_page($url, []);
+
+	t("Trash post #$p_id - comment $c_id",
+			is_redirect( urltoget('post', ['post_id'=>$p_id]), $response ) &&
+			is_flash("Post #$p_id - comment #$c_id moved to trash!", $response)
+		);
+}
+
 
 
 // 
 // Internal functions
 // 
 
-function _auth_username()
+function _auth()
 {
-	return "user1%" . _secure_cookie_authenticity_token('auth_username', 'user1', time());
+	$value = base64_encode("user1%" . _secure_cookie_authenticity_token('auth', 'user1', time()));
+	return $value;
 }
 
 
@@ -291,4 +270,40 @@ function _is_user_page($response, $html_in_response_body=false)
 	}
 
 	return $result;
+}
+
+
+function _test_get_user_page($url)
+{
+	$response = do_get($url);
+	t("redirects to login if not logged-in", is_redirect(urltoget('login'), $response));
+
+	return do_get($url, ['auth'=>_auth()]);
+}
+
+
+function _test_post_user_page($url, $params)
+{
+	$response = do_post($url, $params);
+	t("redirects to login if not logged-in", is_redirect(urltoget('login'), $response));
+
+	return do_post($url, $params,  ['auth'=>_auth()]);
+}
+
+
+function _create_new_post()
+{
+	$url = urltopost('post');
+	$response = do_post($url, ['title' => 'Post #' . rand(), 'body' => 'Post body #' . rand()], ['auth'=>_auth()]);
+	$post_id = data_post_pages_max(1);
+	return data_post_read($post_id);
+}
+
+
+function _create_new_comment($post_id)
+{
+	$url = urltopost('comment', ['post_id'=>$post_id]);
+	$response = do_post($url, ['body' => 'Comment body #' . rand()], ['auth'=>_auth()]);
+	$comment_id = data_comment_pages_max($post_id, 1);
+	return data_comment_read($post_id, $comment_id);
 }

@@ -170,8 +170,13 @@ function data_post_update($id, $title, $body)
 }
 
 
+// Data delete
 
-
+function data_trash_post($id)
+{
+	$t = data_table_posts();
+	return csvdb_delete($t, $id, true);
+}
 
 
 
@@ -249,3 +254,13 @@ function data_comment_pages_max($post_id, $per_page)
 	$t = data_table_comments($post_id);
 	return csvdb_last_id($t) / $per_page;
 }
+
+
+// Delete
+
+function data_trash_comment($post_id, $id)
+{
+	$t = data_table_comments($post_id);
+	return csvdb_delete($t, $id, true);
+}
+

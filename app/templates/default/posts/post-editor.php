@@ -17,4 +17,10 @@
 		<?= tag($post['body'], ['name'=> 'body', 'id'=>'post-body-editor', 'class'=>'editor'], 'textarea'); ?>
 		<input type='submit' value='Post' class='btn btn-primary' />
 	</form>
+
+	<?php if($post): ?>
+		<?= formto('post-to-trash', ['post_id'=>$post['id'], '__method'=>'delete'], ['data-alert'=>'Move post to trash? It can be restored.']) ?>
+			<input type='submit' value='Move to trash' class='btn btn-danger' />
+		</form>
+	<?php endif; ?>
 </div>

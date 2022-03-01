@@ -44,8 +44,8 @@ function initialize(){
 		],
 		// COOKIE params with max_length
 		[
-			'auth_username'	=> 64,
-			'auth_flash'	=> 256
+			'auth'	=> 64,
+			'flash'	=> 256
 		],
 		// GET typecast
 		[
@@ -86,8 +86,8 @@ function initialize(){
 			'comment'	=> ['username', 'post_id', 'comment_id', 'body']
 		],
 		// Delete uri, with required params from $_REQUEST
-		[	'post'		=> ['username', 'post_id'],
-			'comment'	=> ['username', 'post_id', 'comment_id']
+		[	'post-to-trash'		=> ['username', 'post_id'],
+			'comment-to-trash'	=> ['username', 'post_id', 'comment_id']
 		]
 	);
 

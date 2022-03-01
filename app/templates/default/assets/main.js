@@ -1,12 +1,42 @@
-(function(){
-	var $ = {};
-	$.id = function(id) {
-		return document.getElementById(id);
+// jQuery style
+function $$(){
+	if(this.$) return this.$;
+
+	this.$ = {};
+	$.id = function(id, el=false) {
+		return (el || document).getElementById(id);
 	}
-	$.class = function(classname) {
-		return document.getElementsByClassName(classname);
+	$.class = function(classname, el=false) {
+		return (el || document).getElementsByClassName(classname);
+	}
+	$.tag = function(name, el=false) {
+		return (el || document).getElementsByTagName(name);
+	}
+	$.els_with_attr = function(tagname, attr_name, el=false) {
+		var els = (el || document).getElementsByTagName(tagname);
+		var out = [];
+		for (var i = els.length - 1; i >= 0; i--) {
+			if(els[i].attributes[attr_name]) out.push(els[i]);
+		};
+		return out;
+	}
+	$.on = function(el, eventname, cb){
+		el.addEventListener(eventname, cb);
+	}
+	$.each = function(arr, cb){
+		for (var i = arr.length - 1; i >= 0; i--) {
+			cb(arr[i]);
+		};
 	}
 
+	return this.$;
+}
+// End jQuery style
+
+
+
+
+(function($){
 	function textarea_autoexpand_by_id(id){
 		var el = $.id(id);
 		if(el){
@@ -26,7 +56,7 @@
 			quickpost_strlen.innerText = quickpost.value.length + ' / 128';
 		}
 
-		quickpost.addEventListener('keydown', function(e){
+		$.on(quickpost, 'keydown', function(e){
 			quickpost_strlen.innerText = quickpost.value.length + ' / 128';
 		});
 	}
@@ -35,4 +65,11 @@
 	textarea_autoexpand_by_id('post-title-editor');
 	textarea_autoexpand_by_id('post-body-editor');
 	textarea_autoexpand_by_id('comment-body-editor');
-})();
+
+
+	$.each($.els_with_attr('form', 'data-alert'), function(el){
+		$.on(el, 'submit', function(e){
+			if(!confirm(this.dataset.alert)) e.preventDefault();
+		});
+	});
+})($$());
