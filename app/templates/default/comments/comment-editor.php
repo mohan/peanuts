@@ -7,7 +7,7 @@
 		<input type='submit' value='Submit' class='btn btn-primary' />
 	</form>
 
-	<?= formto('comment-to-trash', ['post_id'=>$post_id, 'comment_id'=>$comment['id'], '__method'=>'delete'], ['data-alert'=>'Move comment to trash? It can be restored.']) ?>
+	<?= formto('trash/comment', ['post_id'=>$post_id, 'comment_id'=>$comment['id'], '__method'=>'patch'], ['data-alert'=>'Move comment to trash? It can be restored.']) ?>
 		<input type='submit' value='Move to trash' class='btn btn-danger' />
 	</form>
 </div>

@@ -11,6 +11,11 @@
 			<span id='navbar-links'>
 				<?= linkto('hashtags', 'Hashtags', NULL, ['class' => '']); ?>
 			</span>
+			<form action="<?= urltoget('post/find') ?>" method='get' class='m-l'>
+				<?= tag('', ['name'=>'uri', 'type'=>'hidden', 'value'=>'post/find'], 'input') ?>
+				<?= tag($_GET['post_id'] ? 'Post #' . $_GET['post_id'] : '', ['name'=>'post_id', 'type'=>'text', placeholder=>'Find by post #id', 'class'=>'d-inline small input-text-toggle-clear'], 'input') ?>
+				<?= tag('', ['type'=>'submit', 'value'=>'Go', 'class'=>'d-inline btn btn-sm'], 'input') ?>
+			</form>
 		</div>
 		<div id='navbar-right'>
 			<span class='text-dark medium'>
@@ -26,6 +31,9 @@
 	</div>
 
 	<div class='m-b p-b text-center text-muted small'>
+		<p>
+			<?= linkto('trash/posts', 'Trash', [], ['class'=>'text-muted']); ?>
+		</p>
 		<?= linkto('page', 'Readme', ['slug'=>'readme'], ['class'=>'text-muted']); ?> /
 		<?= linkto('page', 'Markdown', ['slug'=>'markdown'], ['class'=>'text-muted']); ?> /
 		<?= linkto('page', 'Shortcodes', ['slug'=>'shortcodes'], ['class'=>'text-muted']); ?>

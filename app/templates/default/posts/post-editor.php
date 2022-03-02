@@ -19,7 +19,7 @@
 	</form>
 
 	<?php if($post): ?>
-		<?= formto('post-to-trash', ['post_id'=>$post['id'], '__method'=>'delete'], ['data-alert'=>'Move post to trash? It can be restored.']) ?>
+		<?= formto('trash/post', ['post_id'=>$post['id'], '__method'=>'patch'], ['data-alert'=>'Move post to trash? It can be restored.']) ?>
 			<input type='submit' value='Move to trash' class='btn btn-danger' />
 		</form>
 	<?php endif; ?>

@@ -34,7 +34,7 @@ Work in progress: true
 * Shortcore support. Example: [calendar year=yyyy month=mm mark=16].
 * Vote up/down support.
 * Banner post.
-* Sticky posts.
+* Sticky posts. (Embed in banner post with [post #123] shortcode).
 * Notification panel for new comments for current user posts.
 * Multi-team support, with a single installation.
 	* Primary team can be used for posts between all teams.

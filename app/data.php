@@ -21,6 +21,7 @@ function data_table_posts()
 		],
 		'validations_callback' => '_posts_table_validations',
 		'auto_timestamps' => true,		// 20
+		// 'log' => true
 	];
 
 	// meta
@@ -45,7 +46,8 @@ function data_table_comments($post_id)
 		],
 		'text_filename' => 'comments_body.text',
 		'validations_callback' => '_comments_table_validations',
-		'auto_timestamps' => true		// 20
+		'auto_timestamps' => true,		// 20
+		// 'log' => true
 	];
 
 	$t['tablename'] = "post-$post_id-comments.csv";
@@ -93,6 +95,20 @@ function data_post_list($page, $per_page)
 {
 	$t = data_table_posts();
 	return csvdb_list($t, ['id', 'username', 'title', 'meta', 'updated_at'], true, $page, $per_page);
+}
+
+
+function data_trash_post_list()
+{
+	$t = data_table_posts();
+	$posts = csvdb_list($t, ['id', 'username', 'title', 'created_at', 'updated_at', '__is_deleted'], false, 1, -1, function($r){
+		return $r['__is_deleted'] === 1;
+	}, function($r){
+		unset($r['__is_deleted']);
+		return $r;
+	});
+
+	return $posts;
 }
 
 
@@ -155,16 +171,19 @@ function data_post_create($username, $title, $body)
 }
 
 
-function data_post_update($id, $title, $body)
+function data_post_update($id, $title=false, $body=false)
 {
 	$t = data_table_posts();
-	$record = csvdb_read($t, $id, ['body']);
+	$record = csvdb_read($t, $id, ['body', '__is_deleted']);
 	if(!$record) return false;
 
-	$values = [
-		'title' => $title,
-		'body' => csvdb_text_update($t, 'body', $record['body'], $body)
-	];
+	$values = [];
+	if($title && $body){
+		$values = [
+			'title' => $title,
+			'body' => csvdb_text_update($t, 'body', $record['body'], $body)
+		];
+	}
 
 	return csvdb_update($t, $id, $values);
 }
@@ -178,7 +197,40 @@ function data_trash_post($id)
 	return csvdb_delete($t, $id, true);
 }
 
+function data_delete_post($id)
+{
+	$t = data_table_posts();
+	$return_val = csvdb_delete($t, $id);
 
+	if($return_val){
+		$comments_filepath = _csvdb_is_valid_config(data_table_comments($id));
+		if($comments_filepath) file_put_contents($comments_filepath, '');
+	}
+
+	return $return_val;
+}
+
+
+
+function data_post_meta_count_increment_decrement($post_id, $type, $action)
+{
+	$t = data_table_posts();
+
+	switch ($action) {
+		case '+': $factor =  1; break;
+		case '-': $factor = -1; break;
+		default: return;
+	}
+
+	$post = csvdb_read($t, $post_id, ['meta']);
+	if(!$post) return;
+
+	// Don't change updated at for views
+	// if($type == 'v') $post['updated_at'] = false;
+
+	$post['meta'][$type] = $post['meta'][$type] + $factor;
+	csvdb_update($t, $post_id, $post);
+}
 
 
 
@@ -219,32 +271,30 @@ function data_comment_read($post_id, $id, $columns=[])
 
 function data_comment_create($username, $post_id, $body)
 {
-	$tp = data_table_posts();
 	$t = data_table_comments($post_id);
 	$values = [
 		'username' => $username,
 		'body' => csvdb_text_create($t, 'body', $body)
 	];
 
-	if($values['body']){
-		$post = csvdb_read($tp, $post_id, ['meta']);
-		$post['meta']['c'] = $post['meta']['c'] + 1;
-		csvdb_update($tp, $post_id, ['meta'=>$post['meta']]);
-	}
+	if($body) data_post_meta_count_increment_decrement($post_id, 'c', '+');
 
 	return csvdb_create($t, $values);
 }
 
 
-function data_comment_update($post_id, $id, $body)
+function data_comment_update($post_id, $id, $body=false)
 {
 	$t = data_table_comments($post_id);
-	$record = csvdb_read($t, $id, ['body']);
+	$record = csvdb_read($t, $id, ['body', '__is_deleted']);
 	if(!$record) return false;
 
-	$values = [
-		'body' => csvdb_text_update($t, 'body', $record['body'], $body)
-	];
+	$values = [];
+	if($body){
+		$values = [
+			'body' => csvdb_text_update($t, 'body', $record['body'], $body)
+		];
+	}
 
 	return csvdb_update($t, $id, $values);
 }
@@ -256,11 +306,58 @@ function data_comment_pages_max($post_id, $per_page)
 }
 
 
+function data_trash_comments_list()
+{
+	$tp = data_table_posts();
+
+	$posts_with_trashed_comments = csvdb_list($tp, ['id', 'title', 'meta'], false, 1, -1, function($r){
+		return $r['meta']['t_comments'] === true;
+	});
+
+	$trash_comments = [];
+	foreach ($posts_with_trashed_comments as $post) {
+		$post_id = $post['id'];
+		$t = data_table_comments($post_id);
+
+		$comments = csvdb_list($t, ['id', 'username', 'body', 'created_at', 'updated_at', '__is_deleted'], false, 1, -1, function($r){
+			return $r['__is_deleted'] === 1;
+		}, function($r) use ($post){
+			$r['post'] = $post;
+			return $r;
+		});
+
+		csvdb_text_fill_records($t, ['body'], $comments);
+
+		$trash_comments = array_merge($trash_comments, $comments);
+	}
+
+	return $trash_comments;
+}
+
+
 // Delete
 
 function data_trash_comment($post_id, $id)
 {
+	$tp = data_table_posts();
 	$t = data_table_comments($post_id);
+
+	// Has trash comments
+	csvdb_update($tp, $post_id, ['meta'=>['t_comments'=>true], 'updated_at'=>false]);
+
 	return csvdb_delete($t, $id, true);
 }
 
+
+function data_delete_comment($post_id, $id)
+{
+	$tp = data_table_posts();
+	$t = data_table_comments($post_id);
+
+	// Has trash comments
+	csvdb_update($tp, $post_id, ['meta'=>['t_comments'=>false], 'updated_at'=>false]);
+
+	data_post_meta_count_increment_decrement($post_id, 'c', '-');
+
+	return csvdb_delete($t, $id);
+}

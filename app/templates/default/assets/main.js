@@ -23,6 +23,13 @@ function $$(){
 	$.on = function(el, eventname, cb){
 		el.addEventListener(eventname, cb);
 	}
+	$.once = function(el, eventname, cb){
+		var _cb = function(e){
+			el.removeEventListener(eventname, _cb);
+			cb(e);
+		}
+		el.addEventListener(eventname, _cb);
+	}
 	$.each = function(arr, cb){
 		for (var i = arr.length - 1; i >= 0; i--) {
 			cb(arr[i]);
@@ -72,4 +79,18 @@ function $$(){
 			if(!confirm(this.dataset.alert)) e.preventDefault();
 		});
 	});
+
+
+	$.each($.class('input-text-toggle-clear'), function(el){
+		var current_value = el.value;
+		$.on(el, 'focus', function(e){
+			el.value = '';
+
+			$.once(el, 'blur', function(e){
+				if(el.value == '') el.value = current_value;
+			});
+		});
+	});
+
+
 })($$());

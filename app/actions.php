@@ -40,6 +40,7 @@ function filter_set_username()
 
 function get_login()
 {
+	if(isset($_COOKIE['auth'])) cookie_delete('auth');
 	return render('layouts/login.php', ['__pagetitle'=>'Login'], false);
 }
 
@@ -91,12 +92,29 @@ function get_posts()
 	$per_page = 30;
 	$posts = data_post_list($page, $per_page);
 
+	$banner_post = $page == 1 ? data_post_read(CONFIG_BANNER_POST_ID, ['title', 'body']) : false;
+
 	return render('posts/posts.php', [
 		'__pagetitle'=>'Posts',
 		'posts'=>$posts,
 		'page'=>$page,
-		'per_page' => $per_page
+		'per_page' => $per_page,
+		'banner_post' => $banner_post
 	]);
+}
+
+
+function get_post_find()
+{
+	extract($_GET);
+
+	$post = data_post_read($post_id, ['id']);
+	if(!$post){
+		flash_set("Post #$post_id not found!");
+		return redirectto('posts');
+	}
+
+	return redirectto('post', ['post_id'=>$post_id]);
 }
 
 
@@ -105,10 +123,10 @@ function get_post()
 	extract($_GET);
 
 	$post = data_post_read($post_id);
-	if(!$post) return get_404();
+	if(!$post) return get_404('Post not found.');
 
 	$comments = data_comment_list($post_id);
-
+	
 	return render('posts/post.php', [
 		'__pagetitle'=>substr($post['title'], 0, 20),
 		'post'=>$post,
@@ -130,7 +148,7 @@ function get_edit_post()
 	extract($_GET);
 
 	$post = data_post_read($post_id);
-	if(!$post) return get_404();
+	if(!$post) return get_404('Post not found.');
 
 	return render('posts/post-editor.php', ['__pagetitle' => "Edit Post #$post_id", 'post' => $post]);
 }
@@ -181,7 +199,18 @@ function get_page()
 }
 
 
+function get_trash_posts()
+{
+	$data = data_trash_post_list();
+	return render('posts/trash.php', ['__pagetitle' => 'Trash - Posts', 'data'=>$data]);
+}
 
+
+function get_trash_comments()
+{
+	$data = data_trash_comments_list();
+	return render('comments/trash.php', ['__pagetitle' => 'Trash - Comments', 'data'=>$data]);
+}
 
 
 
@@ -253,7 +282,7 @@ function patch_post()
 	extract($_REQUEST);
 
 	if(data_post_update( $post_id, $title, $body )){
-		flash_set('Post updated!');
+		flash_set("Post #$post_id updated!");
 		return redirectto('post', ['post_id'=>$post_id]);
 	} else {
 		flash_set('Invalid/missing values!', true);
@@ -278,12 +307,7 @@ function patch_comment()
 }
 
 
-
-// 
-// Delete requests
-// 
-
-function delete_post_to_trash()
+function patch_trash_post()
 {
 	if(!_can_current_user_edit_post()) return get_404('Post not found.');
 
@@ -297,17 +321,45 @@ function delete_post_to_trash()
 }
 
 
-function delete_comment_to_trash()
+function patch_trash_comment()
 {
 	if(!_can_current_user_edit_comment()) return get_404('Comment not found.');
 
 	extract($_GET);
 
 	flash_set(
-		data_trash_comment($post_id, $comment_id) ? "Post #$post_id - comment #$comment_id moved to trash!" : "An error occurred!"
+		data_trash_comment($post_id, $comment_id) ? "Comment#$comment_id in post#$post_id moved to trash!" : "An error occurred!"
 	);
 
 	return redirectto('post', ['post_id'=>$post_id]);
+}
+
+
+
+
+// Delete
+
+function delete_post()
+{
+	extract($_GET);
+
+	flash_set(
+		data_delete_post($post_id) ? "Post #$post_id and comments deleted!" : "An error occurred!"
+	);
+
+	return redirectto('trash/posts');
+}
+
+
+function delete_comment()
+{
+	extract($_GET);
+
+	flash_set(
+		data_delete_comment($post_id, $comment_id) ? "Comment#$comment_id in post#$post_id deleted!" : "An error occurred!"
+	);
+
+	return redirectto('trash/comments');
 }
 
 
@@ -320,7 +372,7 @@ function _can_current_user_edit_post()
 {
 	extract($_REQUEST);
 
-	$current_post_record = data_post_read($post_id, ['username']);
+	$current_post_record = data_post_read($post_id, ['username', '__is_deleted']);
 	return $current_post_record['username'] == $username;
 }
 
@@ -329,6 +381,6 @@ function _can_current_user_edit_comment()
 {
 	extract($_REQUEST);
 	
-	$current_comment_record = data_comment_read($post_id, $comment_id, ['username']);
+	$current_comment_record = data_comment_read($post_id, $comment_id, ['username', '__is_deleted']);
 	return $current_comment_record['username'] == $username;
 }

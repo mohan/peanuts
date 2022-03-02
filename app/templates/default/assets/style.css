@@ -22,15 +22,27 @@ label, .label{
 input[type='text'], input[type='password'], textarea, .input{
 	font-size: 1em;
 	width: 100%;
-	border-radius: 2px;
+	border-radius: 3px;
 	border: 1px solid #ccc;
 	padding: 5px;
+}
+
+input.d-inline{
+	width: auto;
+	display: inline-block;
+	margin: 0px;
+}
+
+input.small{
+	font-size: 0.8em;
 }
 
 .btn{
 	border-radius: 4px;
 	background: #ccc;
 	padding: 5px 10px;
+	display: inline-block;
+	margin: 5px;
 	border: 0;
 }
 
@@ -63,6 +75,10 @@ input[type='text'], input[type='password'], textarea, .input{
 	margin-bottom: 20px;
 }
 
+.table.thead-text-left thead th{
+	text-align: left;
+}
+
 .table thead th{
 	border-bottom: 1px solid #777;
 	padding: 10px;
@@ -86,6 +102,8 @@ input[type='text'], input[type='password'], textarea, .input{
 
 /* Helpers */
 .d-block{ display: block; }
+.d-inline{ display: inline; }
+.d-inline-block{ display: inline-block; }
 .text-center{ text-align: center; }
 .text-right{ text-align: right; }
 .medium{ font-size: 0.9em; }
@@ -103,6 +121,8 @@ input[type='text'], input[type='password'], textarea, .input{
 .p-t{ padding-top: 20px; }
 .m-b{ margin-bottom: 20px; }
 .m-t{ margin-top: 20px; }
+.m-l{ margin-left: 20px; }
+.w-100{ width: 100%; }
 /* END Helpers */
 
 
@@ -153,7 +173,7 @@ input[type='text'], input[type='password'], textarea, .input{
 /* Navbar */
 #navbar{
 	background: #dedede;
-	padding: 12px 20px 12px 20px;
+	padding: 12px 20px 6px 20px;
 	border-bottom: 1px solid #d9d9d9;
 	margin-bottom: 50px;
 }
@@ -214,7 +234,7 @@ input[type='text'], input[type='password'], textarea, .input{
 .post-panel h3{
 	margin: 0;
 }
-.post-panel h3 .markdown{
+.post-panel h3 .markdown, .post-panel .post-title{
 	font-size: 0.88em;
 	font-weight: normal;
 	font-family: georgia, 'courier new', courier;
@@ -235,7 +255,7 @@ input[type='text'], input[type='password'], textarea, .input{
 	padding-left: 115px;
 }
 .post-panel .header-container h3{
-	padding-top: 5px;
+	padding-top: 15px;
 }
 /* END post panel */
 

@@ -2,18 +2,15 @@
 
 define('APP_ENV_IS_TEST', true);
 define('ROOT_DIR', __DIR__ . '/../');
+define('APP_DIR', ROOT_DIR . '/app/');
 
 require ROOT_DIR . '/lib/test-helpers.php';
-require ROOT_DIR . '/index.php';
+require APP_DIR . '/init.php';
 
 call_tests([
 	'get_login',
 	'post_login',
 	'post_logout',
-
-	'post_quick_post',
-	'post_post',
-	'post_comment',
 
 	'get_root',
 	'get_new_post',
@@ -24,11 +21,19 @@ call_tests([
 	'get_hashtags',
 	'get_page',
 
+	'post_quick_post',
+	'post_post',
+	'post_comment',
+
 	'patch_post',
 	'patch_comment',
 
-	'trash_post',
-	'trash_comment'
+	'patch_trash_post',
+	'patch_trash_comment',
+
+	'get_trash_posts',
+	'get_trash_comments'
+
 ]);
 
 
@@ -92,19 +97,18 @@ function test_get_posts()
 
 function test_get_post()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
 
 	$url = urltoget('post', ['post_id'=>$p_id]);
 	$response = _test_get_user_page($url);
+	var_dump($response);
 	t("gets post post_id $p_id", _is_user_page($response, html_markdown($p_body)));
 }
 
 
 function test_get_edit_post()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
 
 	$url = urltoget('edit-post', ['post_id'=>$p_id]);
 	$response = _test_get_user_page($url);
@@ -114,10 +118,8 @@ function test_get_edit_post()
 
 function test_get_edit_comment()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
-	$comment = _create_new_comment($p_id);
-	extract($comment, EXTR_PREFIX_ALL, 'c');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_comment($p_id), EXTR_PREFIX_ALL, 'c');
 
 	$url = urltoget('edit-comment', ['post_id'=>$p_id, 'comment_id'=>$c_id]);
 	$response = _test_get_user_page($url);
@@ -127,9 +129,11 @@ function test_get_edit_comment()
 
 function test_get_hashtags()
 {
+	$post = _create_new_post('Post with hashtag #zxcv.');
+
 	$url = urltoget('hashtags');
 	$response = _test_get_user_page($url);
-	t("Hashtags", _is_user_page($response, '#zxcv'));
+	t("Hashtags", _is_user_page($response, '#zxcv</a>'));
 }
 
 
@@ -138,6 +142,24 @@ function test_get_page()
 	$url = urltoget('page', ['slug'=>'readme']);
 	$response = _test_get_user_page($url);
 	t("Page", _is_user_page($response, 'License: GPL (Free as in free peanuts.)'));
+}
+
+
+function test_get_trash_posts()
+{
+	$posts = data_trash_post_list();
+	$url = urltoget('trash/posts');
+	$response = _test_get_user_page($url);
+	t("Gets list of trashed posts", _is_user_page($response, (current($posts))['title']));
+}
+
+
+function test_get_trash_comments()
+{
+	$comments = data_trash_comments_list();
+	$url = urltoget('trash/comments');
+	$response = _test_get_user_page($url);
+	t("Gets list of trashed comments", _is_user_page($response, (current($comments))['body']));
 }
 
 
@@ -171,8 +193,7 @@ function test_post_post()
 
 function test_patch_post()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
 
 	$url = urltopost('post', ['__method'=>'patch', 'post_id' => $p_id]);
 	$response = _test_post_user_page($url, ['title' => 'Patched title', 'body' => 'patched text.']);
@@ -187,8 +208,7 @@ function test_patch_post()
 
 function test_post_comment()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
 
 	$url = urltopost('comment', ['post_id'=>$p_id]);
 	$response = _test_post_user_page($url, ['body'=>'Test comment body']);
@@ -204,10 +224,8 @@ function test_post_comment()
 
 function test_patch_comment()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
-	$comment = _create_new_comment($p_id);
-	extract($comment, EXTR_PREFIX_ALL, 'c');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_comment($p_id), EXTR_PREFIX_ALL, 'c');
 
 	$url = urltopost('comment', ['__method'=>'patch', 'post_id'=>$p_id, 'comment_id'=>$c_id]);
 	$response = _test_post_user_page($url, ['body' => 'patched text...']);
@@ -215,31 +233,27 @@ function test_patch_comment()
 }
 
 
-// Delete request
-function test_trash_post()
+function test_patch_trash_post()
 {
-	$post = _create_new_post();
-	extract($post);
+	extract(_create_new_post());
 
-	$url = urltopost('post-to-trash', ['__method'=>'delete', 'post_id'=>$id]);
+	$url = urltopost('trash/post', ['__method'=>'patch', 'post_id'=>$id]);
 	$response = _test_post_user_page($url, []);
 	t("Trash post $id", is_redirect( urltoget('posts'), $response ) && is_flash("Post #$id moved to trash!", $response) );
 }
 
 
-function test_trash_comment()
+function test_patch_trash_comment()
 {
-	$post = _create_new_post();
-	extract($post, EXTR_PREFIX_ALL, 'p');
-	$comment = _create_new_comment($p_id);
-	extract($comment, EXTR_PREFIX_ALL, 'c');
+	extract(_create_new_post(), EXTR_PREFIX_ALL, 'p');
+	extract(_create_new_comment($p_id), EXTR_PREFIX_ALL, 'c');
 
-	$url = urltopost('comment-to-trash', ['__method'=>'delete', 'post_id'=>$p_id, 'comment_id'=>$c_id]);
+	$url = urltopost('trash/comment', ['__method'=>'patch', 'post_id'=>$p_id, 'comment_id'=>$c_id]);
 	$response = _test_post_user_page($url, []);
 
 	t("Trash post #$p_id - comment $c_id",
 			is_redirect( urltoget('post', ['post_id'=>$p_id]), $response ) &&
-			is_flash("Post #$p_id - comment #$c_id moved to trash!", $response)
+			is_flash("Comment#$c_id in post#$p_id moved to trash!", $response)
 		);
 }
 
@@ -265,7 +279,7 @@ function _is_user_page($response, $html_in_response_body=false)
 					) !== false
 				);
 
-	if($html_in_response_body) {
+	if($html_in_response_body !== false) {
 		$result = $result && strpos($response['body'], $html_in_response_body) !== false;
 	}
 
@@ -291,10 +305,10 @@ function _test_post_user_page($url, $params)
 }
 
 
-function _create_new_post()
+function _create_new_post($title='', $body='')
 {
 	$url = urltopost('post');
-	$response = do_post($url, ['title' => 'Post #' . rand(), 'body' => 'Post body #' . rand()], ['auth'=>_auth()]);
+	$response = do_post($url, ['title' => $title ? $title : 'Post #' . rand(), 'body' => $body ? $body : 'Post body #' . rand()], ['auth'=>_auth()]);
 	$post_id = data_post_pages_max(1);
 	return data_post_read($post_id);
 }

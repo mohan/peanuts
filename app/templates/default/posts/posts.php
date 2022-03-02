@@ -1,3 +1,16 @@
+<?= html_flash(); ?>
+
+<?php if($banner_post): ?>
+	<div class='post-panel' style='margin-bottom: 30px; padding:40px 20px 20px 20px;'>
+		<?= tag($banner_post['title'], ['class'=>'post-title', 'style'=>'font-size: 1.1em; padding-bottom:10px;'], 'h3'); ?>
+		<?= html_markdown($banner_post['body']); ?>
+		<div class='m-t text-right small text-muted'>
+			<?= linkto('post', 'View', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?> /
+			<?= linkto('edit-post', 'Edit Banner', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?>
+		</div>
+	</div>
+<?php endif; ?>
+
 <div id='posts'>
 
 	<div class='post-panel border-bottom m-b'>
@@ -15,8 +28,6 @@
 			</form>
 		</div>
 	</div>
-
-	<?= html_flash(); ?>
 
 	<?php
 		foreach($posts as $post){

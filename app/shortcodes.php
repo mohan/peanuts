@@ -59,7 +59,7 @@ function shortcode_calendar($args)
 
 	$marked_days = [];
 	foreach ($mark as $key => $m) {
-		$marked_days[] = date('D j', mktime(0, 0, 0, $month, $m, $year));
+		$marked_days[] = date('D jS', mktime(0, 0, 0, $month, $m, $year));
 	}
 
 	return render_partial('shortcodes/_calendar.php', [

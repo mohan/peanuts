@@ -1,6 +1,8 @@
 <div class='shortcode-calendar'>
 	<h4><?= date('F Y', $month_time) ?></h4>
-	<?= tag_table([ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ], $month_table, ['class'=>'table text-center'], false); ?>
+	<?= tag_table([ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ], $month_table, ['class'=>'table text-center'], function($m, $d){
+		return $m[$d];
+	}); ?>
 	<ul>
 		<?php foreach ($marked_days as $key => $m): ?>
 			<?php if($label[$key]): ?>
