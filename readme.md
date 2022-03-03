@@ -11,7 +11,7 @@ Work in progress: true
 * PHP application.
 * No external database system needed. Uses built-in CSVDB.
 * *Only one team password*. No user passwords to remember.
-* Host it yourself on your LAN. (Ex: `php -S 127.0.0.1:8080`).
+* Host it yourself on your LAN. (Ex: `cd public && php -S 127.0.0.1:8080`).
 
 
 ## Note

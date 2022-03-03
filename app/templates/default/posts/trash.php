@@ -27,8 +27,7 @@
 			case 'title':
 				return
 					tag($record['title'], [], 'p') .
-					tag('#' . $record['id'], ['class'=>'text-muted small'], 'p') .
-					tag(CONFIG_USERS[$record['username']], ['class'=>'small text-muted'], 'p');
+					tag('#' . $record['id'] . ' / ' . CONFIG_USERS[$record['username']], ['class'=>'text-muted small'], 'p');
 
 			default:
 				return htmlentities($record[$header_key]);

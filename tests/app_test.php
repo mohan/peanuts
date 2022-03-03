@@ -4,8 +4,12 @@ define('APP_ENV_IS_TEST', true);
 define('ROOT_DIR', __DIR__ . '/../');
 define('APP_DIR', ROOT_DIR . '/app/');
 
+define('ENABLE_WEB_TEST_RESULTS_INTERFACE', true);
+
 require ROOT_DIR . '/lib/test-helpers.php';
 require APP_DIR . '/init.php';
+
+
 
 call_tests([
 	'get_login',
@@ -34,7 +38,7 @@ call_tests([
 	'get_trash_posts',
 	'get_trash_comments'
 
-]);
+], __FILE__);
 
 
 
@@ -101,7 +105,6 @@ function test_get_post()
 
 	$url = urltoget('post', ['post_id'=>$p_id]);
 	$response = _test_get_user_page($url);
-	var_dump($response);
 	t("gets post post_id $p_id", _is_user_page($response, html_markdown($p_body)));
 }
 

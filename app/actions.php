@@ -191,7 +191,7 @@ function get_page()
 	if($slug == 'readme'){
 		$text = file_get_contents(ROOT_DIR . "/readme.md");
 	} else {
-		$pages_path = ROOT_DIR . '/' . APP_NAME . '/pages';
+		$pages_path = APP_DIR . '/pages';
 		$text = file_get_contents("$pages_path/$slug.md");
 	}
 

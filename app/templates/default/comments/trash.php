@@ -27,8 +27,7 @@
 			case 'body':
 				return 
 					tag($record['body'], [], 'p') .
-					tag(CONFIG_USERS[$record['username']], ['class'=>'small text-muted'], 'p') .
-					tag('Post #' . $record['post']['id'] . ', ' . $record['post']['title'], ['class'=>'text-muted small'], 'p');
+					tag('#' . $record['post']['id'] . ' / ' . CONFIG_USERS[$record['username']] . ', ' . $record['post']['title'], ['class'=>'text-muted small'], 'p');
 
 			default:
 				return htmlentities($record[$header_key]);

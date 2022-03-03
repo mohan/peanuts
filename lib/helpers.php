@@ -64,14 +64,9 @@ function render_partial($template_name, $args=[], $return=false)
 // URL helpers
 // 
 
-function urlto_template_asset($uri)
+function urlto_public_dir($uri)
 {
-	return CONFIG_ROOT_URL
-			. (defined('APP_NAME') ? APP_NAME : '')
-			. '/templates/'
-			. (defined('APP_TEMPLATE') ? APP_TEMPLATE : '')
-			. '/assets/'
-			. $uri;
+	return CONFIG_ROOT_URL . $uri;
 }
 
 

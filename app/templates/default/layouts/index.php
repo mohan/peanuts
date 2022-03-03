@@ -1,7 +1,7 @@
 <html>
 <head>
 	<title><?= $__pagetitle; ?> - <?= CONFIG_TEAM_NAME ?></title>
-	<link rel="stylesheet" type="text/css" href="<?= urlto_template_asset('style.css'); ?>" />
+	<link rel="stylesheet" type="text/css" href="<?= urlto_public_dir('assets/default/style.css'); ?>" />
 </head>
 <body class='<?= $uri ;?> <?= $post_uri ;?> <?= $uri == 'post' && $post['body'] ? 'post-with-body' : ''; ?>'>
 	<div id='navbar' class='clear'>
@@ -39,6 +39,6 @@
 		<?= linkto('page', 'Shortcodes', ['slug'=>'shortcodes'], ['class'=>'text-muted']); ?>
 	</div>
 
-	<script type="text/javascript" src='<?= urlto_template_asset('main.js'); ?>'></script>
+	<script type="text/javascript" src='<?= urlto_public_dir('assets/default/main.js'); ?>'></script>
 </body>
 </html>

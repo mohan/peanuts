@@ -1,7 +1,7 @@
 <html>
 <head>
 	<title>Login - <?= CONFIG_APP_TITLE ?></title>
-	<link rel="stylesheet" type="text/css" href="<?= urlto_template_asset('style.css'); ?>" />
+	<link rel="stylesheet" type="text/css" href="<?= urlto_public_dir('assets/default/style.css'); ?>" />
 </head>
 <body>
 	<div class='panel' style='margin-top:30px;'>

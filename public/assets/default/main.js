@@ -12,11 +12,14 @@ function $$(){
 	$.tag = function(name, el=false) {
 		return (el || document).getElementsByTagName(name);
 	}
-	$.els_with_attr = function(tagname, attr_name, el=false) {
-		var els = (el || document).getElementsByTagName(tagname);
+	$.els_with_attr = function(tagname, attr_name, attr_value=false, el=false) {
+		var els = $.tag(tagname);
 		var out = [];
 		for (var i = els.length - 1; i >= 0; i--) {
-			if(els[i].attributes[attr_name]) out.push(els[i]);
+			if(els[i].attributes[attr_name]) {
+				if(attr_value === false) out.push(els[i]);
+				else if(els[i].attributes[attr_name] == attr_value) out.push(els[i]);
+			}
 		};
 		return out;
 	}
@@ -29,6 +32,13 @@ function $$(){
 			cb(e);
 		}
 		el.addEventListener(eventname, _cb);
+	}
+	$.on_focus_blur = function(el, focus_cb, blur_cb){
+		$.on(el, 'focus', function(e){
+			focus_cb(e);
+
+			$.once(el, 'blur', blur_cb);
+		});
 	}
 	$.each = function(arr, cb){
 		for (var i = arr.length - 1; i >= 0; i--) {
@@ -83,14 +93,11 @@ function $$(){
 
 	$.each($.class('input-text-toggle-clear'), function(el){
 		var current_value = el.value;
-		$.on(el, 'focus', function(e){
-			el.value = '';
-
-			$.once(el, 'blur', function(e){
-				if(el.value == '') el.value = current_value;
-			});
-		});
+		$.on_focus_blur(
+			el,
+			function(e){ el.value='' },
+			function(e){ if(el.value == '') el.value = current_value; }
+		);
 	});
-
 
 })($$());
