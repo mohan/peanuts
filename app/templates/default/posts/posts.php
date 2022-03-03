@@ -1,7 +1,7 @@
 <?= html_flash(); ?>
 
 <?php if($banner_post): ?>
-	<div class='post-panel' style='margin-bottom: 30px; padding:40px 20px 20px 20px;'>
+	<div id='banner-post' class='post-panel' style='margin-bottom: 30px; padding:40px 20px 20px 20px;'>
 		<?= tag($banner_post['title'], ['class'=>'post-title', 'style'=>'font-size: 1.1em; padding-bottom:10px;'], 'h3'); ?>
 		<?= html_markdown($banner_post['body']); ?>
 		<div class='m-t text-right small text-muted'>

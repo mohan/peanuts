@@ -93,9 +93,16 @@ function test_get_new_post()
 
 function test_get_posts()
 {
+	for($i=0; $i<=30; $i++) _create_new_post();
+
 	$url = urltoget('posts');
 	$response = _test_get_user_page($url);
-	t("gets posts", _is_user_page($response, formto('quick-post')));
+	t("gets posts", _is_user_page($response, [
+						formto('quick-post'),
+						"<div class='post-panel clear'>"
+					]) &&
+					substr_count($response['body'], "<div class='post-panel clear'>") == 30
+				);
 }
 
 
@@ -174,9 +181,9 @@ function test_get_trash_comments()
 function test_post_quick_post()
 {
 	$url = urltopost('quick-post');
-	$response = _test_post_user_page($url, ['title'=>'This is a quick post']);
+	$response = _test_post_user_page($url, ['title'=>'This is a quick post ' . time()]);
 	$post_id = data_post_pages_max(1);
-	t("creates a quick post $post_id", is_redirect( urltoget('posts'), $response));
+	t("creates a quick post $post_id", is_redirect(urltoget('posts'), $response) && is_flash("New post created!", $response));
 }
 
 
@@ -281,12 +288,28 @@ function _is_user_page($response, $html_in_response_body=false)
 						tag(CONFIG_USERS[$_REQUEST['username']], ['id'=>'navbar-username'], 'span')
 					) !== false
 				);
-
-	if($html_in_response_body !== false) {
-		$result = $result && strpos($response['body'], $html_in_response_body) !== false;
+	if(!$result) {
+		echo "is_not_redirect failed\n";
+		return false;
 	}
 
-	return $result;
+	if($html_in_response_body !== false) {
+		if(is_array($html_in_response_body)){
+			foreach ($html_in_response_body as $html) {
+				if(strpos($response['body'], $html) === false) {
+					echo "html_in_response_body failed - " . htmlentities($html) . "\n";
+					return false;
+				}
+			}
+		} else {
+			if(strpos($response['body'], $html_in_response_body) === false){
+				echo "html_in_response_body failed - " . htmlentities($html_in_response_body) . "\n";
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 
