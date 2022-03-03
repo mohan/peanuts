@@ -1,4 +1,6 @@
 <?php
+// Peanuts
+// License: GPL
 
 function shortcodes_list()
 {

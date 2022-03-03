@@ -1,4 +1,6 @@
 <?php
+// Peanuts
+// License: GPL
 
 define('APP_ENV_IS_TEST', true);
 define('ROOT_DIR', __DIR__ . '/../');
@@ -38,7 +40,7 @@ call_tests([
 	'get_trash_posts',
 	'get_trash_comments'
 
-], __FILE__);
+]);
 
 
 

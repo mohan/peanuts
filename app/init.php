@@ -1,4 +1,7 @@
 <?php
+// Peanuts
+// License: GPL
+
 require ROOT_DIR . '/lib/helpers.php';
 require ROOT_DIR . '/lib/csvdb.php';
 

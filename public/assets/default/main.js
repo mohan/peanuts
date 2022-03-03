@@ -1,3 +1,7 @@
+// Peanuts
+// License: GPL
+
+
 // jQuery style
 function $$(){
 	if(this.$) return this.$;

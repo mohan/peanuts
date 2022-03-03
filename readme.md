@@ -32,26 +32,18 @@ Work in progress: true
 * Team members comment on posts.
 * Markdown support.
 * Shortcore support. Example: [calendar year=yyyy month=mm mark=16].
-* Vote up/down support.
 * Banner post.
 * Sticky posts. (Embed in banner post with [post #123] shortcode).
-* Notification panel for new comments for current user posts.
-* Multi-team support, with a single installation.
+* Multi-team support
 	* Primary team can be used for posts between all teams.
 	* Individual teams post in their team board.
 * Posts contain title and body fields only.
-	* Posts listing page contains title, user, last-updated-at, vote up/down count, comments count.
 	* Create new post page with title and body fields.
 	* QuickPost in listing page. 128 characters maximum; insert into title; with bottom String.length display.
-	* Title field may contain hashtags. Will be used for tags. Display latest 32 bottom of posts. Tags page contains tags listing.
-	* Counts are stored in post meta JSON.
-	* Guest post - guest name is stored in post meta.
-	* Post total view count - store in post meta.
+	* Title field may contain hashtags. Used for tags. Tags page contains tags listing.
 * Comments support markdown.
-* Vote up/down is stored as a comment.
 * No external libraries.
-* No markdown rendering. Display raw. (Exceptions: text styles, table)
-* No support for search.
+* No support for search. Use tags for categorization.
 * No support for uploads/images. Instead post a link to an image.
 
 

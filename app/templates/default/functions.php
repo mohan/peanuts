@@ -1,4 +1,6 @@
 <?php
+// Peanuts
+// License: GPL
 
 function user_initial($username)
 {
