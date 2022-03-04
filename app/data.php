@@ -21,12 +21,9 @@ function data_table_posts()
 		],
 		'validations_callback' => '_posts_table_validations',
 		'auto_timestamps' => true,		// 20
+		'auto_managed_text_columns' => ['body']
 		// 'log' => true
 	];
-
-	// meta
-	// comments, stars, views
-	// { c: 10, s: 10, v: 10 }
 
 	return $t;
 }
@@ -47,6 +44,7 @@ function data_table_comments($post_id)
 		'text_filename' => 'comments_body.text',
 		'validations_callback' => '_comments_table_validations',
 		'auto_timestamps' => true,		// 20
+		'auto_managed_text_columns' => ['body']
 		// 'log' => true
 	];
 
@@ -116,8 +114,6 @@ function data_post_read($id, $columns=[])
 {
 	$t = data_table_posts();
 	$post = csvdb_read($t, $id, $columns);
-	
-	if($post['body']) csvdb_text_fill_record($t, ['body'], $post);
 
 	return $post;
 }
@@ -164,7 +160,7 @@ function data_post_create($username, $title, $body)
 	$values = [
 		'username' => $username,
 		'title' => $title,
-		'body' => csvdb_text_create($t, 'body', $body)
+		'body' => $body
 	];
 
 	return csvdb_create($t, $values);
@@ -181,7 +177,7 @@ function data_post_update($id, $title=false, $body=false)
 	if($title && $body){
 		$values = [
 			'title' => $title,
-			'body' => csvdb_text_update($t, 'body', $record['body'], $body)
+			'body' => $body
 		];
 	}
 
@@ -251,8 +247,6 @@ function data_comment_list($post_id)
 		if(!$record['body']) unset($records[$key]);
 	}
 
-	csvdb_text_fill_records($t, ['body'], $records);
-
 	return $records;
 }
 
@@ -262,8 +256,6 @@ function data_comment_read($post_id, $id, $columns=[])
 	$t = data_table_comments($post_id);
 	$comment = csvdb_read($t, $id, $columns);
 	$comment['post_id'] = $post_id;
-	
-	if($comment['body']) csvdb_text_fill_record($t, ['body'], $comment);
 
 	return $comment;
 }
@@ -274,7 +266,7 @@ function data_comment_create($username, $post_id, $body)
 	$t = data_table_comments($post_id);
 	$values = [
 		'username' => $username,
-		'body' => csvdb_text_create($t, 'body', $body)
+		'body' => $body
 	];
 
 	if($body) data_post_meta_count_increment_decrement($post_id, 'c', '+');
@@ -292,7 +284,7 @@ function data_comment_update($post_id, $id, $body=false)
 	$values = [];
 	if($body){
 		$values = [
-			'body' => csvdb_text_update($t, 'body', $record['body'], $body)
+			'body' => $body
 		];
 	}
 
@@ -325,8 +317,6 @@ function data_trash_comments_list()
 			$r['post'] = $post;
 			return $r;
 		});
-
-		csvdb_text_fill_records($t, ['body'], $comments);
 
 		$trash_comments = array_merge($trash_comments, $comments);
 	}

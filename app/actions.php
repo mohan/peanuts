@@ -92,7 +92,7 @@ function get_posts()
 	$per_page = 30;
 	$posts = data_post_list($page, $per_page);
 
-	$banner_post = $page == 1 ? data_post_read(CONFIG_BANNER_POST_ID, ['title', 'body']) : false;
+	$banner_post = $page == 1 ? data_post_read(CONFIG_BANNER_POST_ID, ['title', 'body', 'username']) : false;
 
 	return render('posts/posts.php', [
 		'__pagetitle'=>'Posts',

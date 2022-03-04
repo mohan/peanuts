@@ -22,26 +22,29 @@ function $$(){
 		for (var i = els.length - 1; i >= 0; i--) {
 			if(els[i].attributes[attr_name]) {
 				if(attr_value === false) out.push(els[i]);
-				else if(els[i].attributes[attr_name] == attr_value) out.push(els[i]);
+				else if(els[i].attributes[attr_name].value == attr_value) out.push(els[i]);
 			}
 		};
 		return out;
 	}
-	$.on = function(el, eventname, cb){
-		el.addEventListener(eventname, cb);
+	$.on = function(el, eventnames, cb){
+		for (var i = eventnames.length - 1; i >= 0; i--) el.addEventListener(eventnames[i], cb);
 	}
-	$.once = function(el, eventname, cb){
+	$.off = function(el, eventnames, cb){
+		for (var i = eventnames.length - 1; i >= 0; i--) el.removeEventListener(eventnames[i], cb);
+	}
+	$.once = function(el, eventnames, cb){
 		var _cb = function(e){
-			el.removeEventListener(eventname, _cb);
+			$.off(el, eventnames, cb);
 			cb(e);
 		}
-		el.addEventListener(eventname, _cb);
+		$.on(el, eventnames, _cb);
 	}
 	$.on_focus_blur = function(el, focus_cb, blur_cb){
-		$.on(el, 'focus', function(e){
+		$.on(el, ['focus'], function(e){
 			focus_cb(e);
 
-			$.once(el, 'blur', blur_cb);
+			$.once(el, ['blur'], blur_cb);
 		});
 	}
 	$.each = function(arr, cb){
@@ -63,6 +66,10 @@ function $$(){
 		if(el){
 			el.style.minHeight = el.scrollHeight;
 
+			$.on(el, ['blur', 'focus'], function(e){
+				el.style.minHeight = el.scrollHeight;
+			});
+
 			setInterval(function(){
 				el.style.minHeight = el.scrollHeight;
 			}, 4000);
@@ -73,12 +80,10 @@ function $$(){
 	var quickpost = $.id('quickpost-editor');
 	var quickpost_strlen = $.id('quickpost-strlen');
 	if(quickpost){
-		if(quickpost.innerHTML.length > 0){
-			quickpost_strlen.innerText = quickpost.value.length + ' / 128';
-		}
+		quickpost_strlen.innerText = quickpost.value.length;
 
-		$.on(quickpost, 'keydown', function(e){
-			quickpost_strlen.innerText = quickpost.value.length + ' / 128';
+		$.on(quickpost, ['keyup'], function(e){
+			quickpost_strlen.innerText = quickpost.value.length;
 		});
 	}
 
@@ -89,7 +94,7 @@ function $$(){
 
 
 	$.each($.els_with_attr('form', 'data-alert'), function(el){
-		$.on(el, 'submit', function(e){
+		$.on(el, ['submit'], function(e){
 			if(!confirm(this.dataset.alert)) e.preventDefault();
 		});
 	});
@@ -103,5 +108,14 @@ function $$(){
 			function(e){ if(el.value == '') el.value = current_value; }
 		);
 	});
+
+
+	var form_post_find = $.id('form-post-find');
+	if(form_post_find){
+		$.on(form_post_find, ['submit'], function(e){
+			var input = $.els_with_attr('input', 'placeholder', 'Find by post #id')[0];
+			input.value = input.value.match(/\d+/)[0];
+		});
+	}
 
 })($$());

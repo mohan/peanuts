@@ -25,7 +25,8 @@ function html_app_title()
 
 function html_user_icon($username)
 {
-	return tag(user_initial($username), ['class'=>'user-icon'], 'h4');
+	$i = user_initial($username);
+	return tag($i, ['class'=>'user-icon', 'id'=>"user-initial-$i"], 'h4');
 }
 
 function url_getpost($post)

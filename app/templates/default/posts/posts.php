@@ -1,12 +1,12 @@
 <?= html_flash(); ?>
 
 <?php if($banner_post): ?>
-	<div id='banner-post' class='post-panel' style='margin-bottom: 30px; padding:40px 20px 20px 20px;'>
+	<div id='banner-post' class='post-panel'>
 		<?= tag($banner_post['title'], ['class'=>'post-title', 'style'=>'font-size: 1.1em; padding-bottom:10px;'], 'h3'); ?>
 		<?= html_markdown($banner_post['body']); ?>
 		<div class='m-t text-right small text-muted'>
-			<?= linkto('post', 'View', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?> /
-			<?= linkto('edit-post', 'Edit Banner', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?>
+			<?= linkto('post', 'View Banner', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?>
+			<?php if($banner_post['username'] == $_REQUEST['username']) echo ' / ' . linkto('edit-post', 'Edit', ['post_id'=>CONFIG_BANNER_POST_ID], ['class'=>'text-muted']); ?>
 		</div>
 	</div>
 <?php endif; ?>
@@ -23,7 +23,7 @@
 					QuickPost (<?= linkto('hashtags', 'Hashtags', [], ['class'=>'text-muted']); ?>)
 				</label>
 				<?= tag($_POST['title'], ['name'=> 'title', 'id'=>'quickpost-editor', 'class'=>'input', 'style'=>'height:100px;'], 'textarea'); ?>
-				<div id='quickpost-strlen' class='small text-muted'></div>
+				<div class='small text-muted'><span id='quickpost-strlen'>0</span> / 128</div>
 				<input type='submit' value='Post' class='btn btn-primary' />
 			</form>
 		</div>
