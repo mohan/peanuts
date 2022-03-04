@@ -3,7 +3,7 @@
 Discussion board for teams.
 
 
-License: GPL (Free as in free peanuts.)
+License: GPL
 
 Work in progress: true
 
@@ -18,7 +18,7 @@ Work in progress: true
 * **Not tested**, do not use.
 * Please feel free to implement it yourself.
 * Internet hosting is discouraged.
-	* Built and designed to be used as an internal application in our unit.
+	* Built and designed to be used as an internal application.
 	* Less secure is enough, as it is hosted on LAN - Local Area Network.
 
 

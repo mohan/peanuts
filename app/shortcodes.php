@@ -14,6 +14,8 @@ function shortcode_post($args)
 	
 	$post = data_post_read($id, ['id', 'username', 'title', 'meta', 'updated_at']);
 
+	if(!$post) return '';
+
 	return "<div class='shortcode-post'>" . render_partial('posts/_post.php', ['post'=>$post], true) . "</div>";
 }
 

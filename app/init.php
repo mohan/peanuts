@@ -2,13 +2,10 @@
 // Peanuts
 // License: GPL
 
-require ROOT_DIR . '/lib/helpers.php';
-require ROOT_DIR . '/lib/csvdb.php';
-
-filter_set_config(ROOT_DIR . '/config.ini');
 define('APP_NAME', 'app');
 define('APP_TEMPLATE', CONFIG_TEMPLATE);
 
+require ROOT_DIR . '/lib/csvdb.php';
 require APP_DIR . '/data.php';
 require APP_DIR . '/actions.php';
 require APP_DIR . '/shortcodes.php';
@@ -22,7 +19,7 @@ function app_init(){
 			'post_uri'		=> '/^[a-z\d_\/-]+$/',
 			'patch_uri'		=> '/^[a-z\d_\/-]+$/',
 			'delete_uri'	=> '/^[a-z\d_\/-]+$/',
-			'post_id'		=> '/^\d+$/',
+			'post_id'		=> '/^\d*$/',
 			'comment_id'	=> '/^\d+$/',
 			'page'			=> '/^\d+$/',
 			'hashtag'		=> '/^[a-zA-Z\d_-]+$/',

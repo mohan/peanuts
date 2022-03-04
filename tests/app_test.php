@@ -8,7 +8,10 @@ define('APP_DIR', ROOT_DIR . '/app/');
 
 define('ENABLE_WEB_TEST_RESULTS_INTERFACE', true);
 
+require ROOT_DIR . '/lib/helpers.php';
 require ROOT_DIR . '/lib/test-helpers.php';
+
+filter_set_config(ROOT_DIR . '/data/config.test.ini');
 require APP_DIR . '/init.php';
 
 
@@ -95,7 +98,7 @@ function test_get_new_post()
 
 function test_get_posts()
 {
-	// for($i=0; $i<=30; $i++) _create_new_post();
+	for($i=0; $i<=30; $i++) _create_new_post();
 
 	$url = urltoget('posts');
 	$response = _test_get_user_page($url);
@@ -153,7 +156,7 @@ function test_get_page()
 {
 	$url = urltoget('page', ['slug'=>'readme']);
 	$response = _test_get_user_page($url);
-	t("Page", _is_user_page($response, 'License: GPL (Free as in free peanuts.)'));
+	t("Page", _is_user_page($response, 'License: GPL'));
 }
 
 

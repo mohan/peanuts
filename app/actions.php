@@ -15,7 +15,7 @@ function filter_set_username()
 
 	$username = secure_cookie_get('auth');
 
-	if($username){
+	if($username && CONFIG_USERS[$username]){
 		// Update cookie authenticity
 		secure_cookie_set('auth', $username);
 
@@ -108,7 +108,7 @@ function get_post_find()
 {
 	extract($_GET);
 
-	$post = data_post_read($post_id, ['id']);
+	$post = $post_id ? data_post_read($post_id, ['id']) : false;
 	if(!$post){
 		flash_set("Post #$post_id not found!");
 		return redirectto('posts');

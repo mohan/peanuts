@@ -9,7 +9,7 @@
 		<div class='body'>
 			Page not found!
 
-			<?= tag($message, [], 'p') ?>
+			<?= tag($message, ['class'=>'text-muted'], 'p') ?>
 		</div>
 	</div>
 </body>

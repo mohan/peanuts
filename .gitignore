@@ -4,6 +4,22 @@ data/*
 !data/.keep
 
 
+#
+# Data files
+#
+
+*.csv
+*.text
+.tmp
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-[0-9]*
+
+
+
 
 
 #
