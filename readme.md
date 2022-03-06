@@ -26,7 +26,7 @@ Work in progress: true
 ## Peanuts Specification
 
 * Discussion board for teams on LAN for collaboration/notes/knowledge-base/project-management/talk.
-* User, post and comment only, for simplicity.
+* User, post (article) and comment only, for simplicity.
 * Password protected. Team password only. No user password.
 * Team members write posts.
 * Team members comment on posts.
@@ -87,6 +87,7 @@ Process:
 * Rails
 * Django
 * Flask
+* PEP
 * ExpressJS
 * Lumen
 * jQuery

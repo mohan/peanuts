@@ -92,12 +92,12 @@ function urltopost($uri, $args=[], $arg_separator='&')
 {
 	if(!$args) $args = [];
 	
-	if($args['__method'] == 'patch' || $args['__method'] == 'delete'){
+	if( isset($args['__method']) && ($args['__method'] == 'patch' || $args['__method'] == 'delete') ){
 		$_args = [$args['__method'] . '_uri' => $uri];
 	} else {
 		$_args = ['post_uri' => $uri];
 	}
-	if($args['__method']) unset($args['__method']);
+	if( isset($args['__method']) ) unset($args['__method']);
 
 	$args = array_merge($_args, $args);
 
@@ -171,9 +171,10 @@ function tag($html, $attrs=[], $name='div', $closing=true)
 {
 	if($name != 'input' && $name != 'textarea' && !$html) return;
 
+	$attrs_str = '';
 	foreach ($attrs as $key => $value) $attrs_str .= "$key='" . htmlentities($value) . "' ";
 	
-	$out .= "<$name $attrs_str";
+	$out = "<$name $attrs_str";
 
 	if($name != 'input'){
 		$out .= ">" . htmlentities($html);
@@ -229,6 +230,7 @@ function tag_table($headers, $data, $attrs=[], $cb=false)
 function render_markdown($text, $shortcodes=false)
 {
 	$text = strip_tags($text);
+	$out = '';
 	
 	// Todo: Optimize, use substr.
 	$lines = explode("\n", $text);
@@ -519,19 +521,19 @@ function filter_routes($get_action_names, $post_action_names, $patch_action_name
 {
 	if(defined('TEMPLATE_HAS_RENDERED')) return false;
 
-	if($_GET['post_uri']){
+	if( isset($_GET['post_uri']) ) {
 		if($_SERVER['REQUEST_METHOD'] != 'POST') return false;
 		return _filter_routes_method('post', 'post_uri', $post_action_names);
-	} else if($_GET['patch_uri']) {
+	} else if( isset($_GET['patch_uri']) ) {
 		if($_SERVER['REQUEST_METHOD'] != 'POST') return false;
 		return _filter_routes_method('patch', 'patch_uri', $patch_action_names);
-	} else if($_GET['delete_uri']) {
+	} else if( isset($_GET['delete_uri']) ) {
 		if($_SERVER['REQUEST_METHOD'] != 'POST') return false;
 		return _filter_routes_method('delete', 'delete_uri', $delete_action_names);
-	} else if($_GET['uri']) {
+	} else if( isset($_GET['uri']) ) {
 		if($_SERVER['REQUEST_METHOD'] != 'GET') return false;
 		return _filter_routes_method('get', 'uri', $get_action_names);
-	} else if( !$_GET['uri'] ) {
+	} else if( !isset($_GET['uri']) ) {
 		if($_SERVER['REQUEST_METHOD'] != 'GET') return false;
 		return get_root();
 	}
@@ -581,18 +583,27 @@ function _filter_routes_method($method_name, $uri_param_key, $action_names)
 // Ex: $get_param_names = [ 'param_name' => int_length ... ]
 function filter_permitted_params($get_param_names, $post_param_names, $cookie_param_names, $get_typecasts, $post_typecasts)
 {
-	if(!_filter_permitted_params_names($_GET, $get_param_names)) return false;
-	if(!_filter_permitted_params_names($_POST, $post_param_names)) return false;
-	if(!_filter_permitted_params_names($_COOKIE, $cookie_param_names)) return false;
+	$uri_param_key =  isset($_GET['post_uri']) ? 'post_uri' :
+						isset($_GET['patch_uri']) ? 'patch_uri' :
+						isset($_GET['delete_uri']) ? 'delete_uri' :
+						isset($_GET['uri']) ? 'uri' : false;
+
+	if(!$uri_param_key) return false;
+
+	if(!_filter_permitted_params_names($_GET, $uri_param_key, $get_param_names)) return false;
+	if(!_filter_permitted_params_names($_POST, $uri_param_key, $post_param_names)) return false;
+	if(!_filter_permitted_params_names($_COOKIE, $uri_param_key, $cookie_param_names)) return false;
 
 	_filter_permitted_params_typecast($_GET, $get_typecasts);
 	_filter_permitted_params_typecast($_POST, $post_typecasts);
+	
+	_array_fill_keys_with_null($_GET, array_diff(['uri', 'post_uri', 'patch_uri', 'delete_uri'], [$uri_param_key]));
 
 	return true;
 }
 
 
-function _filter_permitted_params_names($input, $permitted_arr)
+function _filter_permitted_params_names(&$input, $uri_param_key, $permitted_arr)
 {
 	foreach ($input as $key => $value) {
 		if(!array_key_exists($key, $permitted_arr)) unset($input[$key]);
@@ -606,6 +617,8 @@ function _filter_permitted_params_names($input, $permitted_arr)
 		}
 	}
 
+	_array_fill_keys_with_null($input, array_keys($permitted_arr), [$uri_param_key]);
+
 	return true;
 }
 
@@ -613,7 +626,7 @@ function _filter_permitted_params_names($input, $permitted_arr)
 function _filter_permitted_params_typecast($input, $typecast_def_arr)
 {
 	foreach ($typecast_def_arr as $name => $type) {
-		if(is_string($input[$name]))
+		if(isset($input[$name]) && is_string($input[$name]))
 		switch ($type) {
 			case 'int': $input[$name] = intval($input[$name]); break;
 			case 'float': $input[$name] = floatval($input[$name]); break;
@@ -633,6 +646,15 @@ function _filter_permitted_params_typecast($input, $typecast_def_arr)
 // 
 // Internal functions
 // 
+
+// Fill null in arr, isset will not be needed
+function _array_fill_keys_with_null(&$arr, $keys)
+{
+	foreach ($keys as $key) {
+		if(!isset($arr[$key])) $arr[$key] = NULL;
+	}
+}
+
 
 // 
 // Headers

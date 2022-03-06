@@ -13,7 +13,7 @@
 			</span>
 			<form id='form-post-find' action="<?= urltoget('post/find') ?>" method='get' class='m-l'>
 				<?= tag('', ['name'=>'uri', 'type'=>'hidden', 'value'=>'post/find'], 'input') ?>
-				<?= tag($_GET['post_id'] ? 'Post #' . $_GET['post_id'] : '', ['name'=>'post_id', 'type'=>'text', placeholder=>'Find by post #id', 'class'=>'d-inline small input-text-toggle-clear'], 'input') ?>
+				<?= tag($_GET['post_id'] ? 'Post #' . $_GET['post_id'] : '', ['name'=>'post_id', 'type'=>'text', 'placeholder'=>'Find by post #id', 'class'=>'d-inline small input-text-toggle-clear'], 'input') ?>
 				<?= tag('', ['type'=>'submit', 'value'=>'Go', 'class'=>'d-inline btn btn-sm'], 'input') ?>
 			</form>
 		</div>
