@@ -13,7 +13,7 @@ require APP_DIR . '/init.php';
 
 /*
 *
-* Uncomment the below line (`app_init`) to start using the app.
+* Please uncomment the below line (`app_init`) to start using the app.
 *
 * No warranties/liabilities apply as per GPL license. You are responsible for your own awesomeness!
 *
@@ -22,7 +22,7 @@ require APP_DIR . '/init.php';
 
 /*
 *
-* Delete all below lines as well.
+* Please delete all the below lines as well.
 *
 */
 ?>
